@@ -1,0 +1,29 @@
+type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
+    id: Int!
+    name: String!
+    description: String!
+
+	Interval:     String!
+	DeadlineHour: Int!
+	DeadlineDay:  String!
+	DeadlineWeek: Int!
+
+    enabled: Boolean!
+
+    tobanMemberSequence: Int!
+
+    createdAt: Time!
+    updatedAt: Time!
+}
+
+input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanInput") {
+    name: String!
+    description: String!
+
+	Interval:     String!
+	DeadlineHour: Int!
+	DeadlineDay:  String!
+	DeadlineWeek: Int!
+
+    tobanMemberSequence: Int!
+}

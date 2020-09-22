@@ -1,0 +1,42 @@
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: toban-api
+spec:
+  selector:
+    app: toban-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: toban-api
+  name: toban-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: toban-api
+  template:
+    metadata:
+      labels:
+        app: toban-api
+    spec:
+      containers:
+        - name: api
+          image: faruryo/toban-api
+          imagePullPolicy: Never
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "100m"

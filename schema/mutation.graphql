@@ -1,0 +1,10 @@
+type Mutation {
+  createTobanWariate(tw: CreateTobanWariateInput!): TobanWariate!
+
+  createToban(toban: CreateTobanInput!): Toban!
+  deleteToban(id: Int!): Toban!
+
+  createTobanMember(tm: CreateTobanMemberInput!): TobanMember!
+
+  createMember(member: CreateMemberInput!): Member!
+}

@@ -1,0 +1,13 @@
+type Query {
+    tobanWariate(id: Int!): TobanWariate
+    tobanWariates(limit: Int, offset: Int): [TobanWariate!]!
+
+    toban(id: Int!): Toban
+    tobans(limit: Int, offset: Int): [Toban!]!
+
+    tobanMember(id: Int!): TobanMember
+    tobanMembers(limit: Int, offset: Int): [TobanMember!]!
+
+    member(id: Int!): Member
+    members(limit: Int, offset: Int): [Member!]!
+}

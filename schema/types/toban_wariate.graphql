@@ -1,0 +1,19 @@
+type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWariate") {
+    id: Int!
+
+	tobanID: Int!
+	tobanSequence: Int!
+	memberID: Int!
+
+	isDone: Boolean
+	doneAt: Time
+
+    createdAt: Time!
+    updatedAt: Time!
+}
+
+input CreateTobanWariateInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanWariateInput") {
+    tobanID: Int!
+    tobanSequence: Int!
+    memberID: Int!
+}

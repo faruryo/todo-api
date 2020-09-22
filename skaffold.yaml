@@ -1,0 +1,20 @@
+apiVersion: skaffold/v2beta7
+kind: Config
+metadata:
+  name: toban-api
+build:
+  artifacts:
+    - image: faruryo/toban-api
+      docker:
+        dockerfile: Dockerfile
+  local:
+    useBuildkit: true
+deploy:
+  kubectl:
+    manifests:
+      - kubernetes/api.yaml
+portForward:
+  - resourceType: service
+    resourceName: toban-api
+    port: 80
+    localPort: 8080

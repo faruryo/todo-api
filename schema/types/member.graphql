@@ -1,0 +1,14 @@
+type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
+    id: Int!
+    slackID: String!
+
+    name: String!
+
+    createdAt: Time!
+    updatedAt: Time!
+}
+
+input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.CreateMemberInput") {
+    slackID: String!
+    name: String!
+}

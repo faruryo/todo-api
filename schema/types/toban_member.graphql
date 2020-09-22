@@ -1,0 +1,16 @@
+type TobanMember @goModel(model: "github.com/faruryo/toban-api/models.TobanMember") {
+    id: Int!
+
+    tobanID: Toban! @goField(forceResolver: true)
+    sequence: Int!
+    memberID: Member! @goField(forceResolver: true)
+
+    createdAt: Time!
+    updatedAt: Time!
+}
+
+input CreateTobanMemberInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanMemberInput") {
+    tobanID: Int!
+    sequence: Int!
+    memberID: Int!
+}
