@@ -12,12 +12,12 @@ import (
 	"github.com/faruryo/toban-api/repositories"
 	"github.com/faruryo/toban-api/resolvers"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 const defaultPort = "8080"
-const dataSource = "toban:toban@tcp(toban-mysql:3306)/toban?charset=utf8mb4"
+const dsn = "toban:toban@tcp(toban-mysql:3306)/toban?charset=utf8mb4&parseTime=true"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -25,20 +25,12 @@ func main() {
 		port = defaultPort
 	}
 
-	db, err := gorm.Open("mysql", dataSource)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		DisableAutomaticPing: true,
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
-	defer func() {
-		if db != nil {
-			if err := db.Close(); err != nil {
-				panic(err)
-			}
-		}
-	}()
-	db.LogMode(true)
-
-	repositories.NewTobanRepository(db)
 
 	srv := handler.NewDefaultServer(
 		generated.NewExecutableSchema(generated.Config{

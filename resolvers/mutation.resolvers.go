@@ -28,17 +28,17 @@ func (r *mutationResolver) CreateToban(ctx context.Context, toban models.CreateT
 
 		Enabled: true,
 
-		TobanMemberSequence: toban.TobanMemberSequence,
+		TobanMemberSequence: 0,
 
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-	r.tobans = append(r.tobans, t)
-	return t, nil
+
+	return r.TobanRepository.Create(ctx, t)
 }
 
-func (r *mutationResolver) DeleteToban(ctx context.Context, id int) (*models.Toban, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) DeleteToban(ctx context.Context, id int) (bool, error) {
+	return r.TobanRepository.Delete(ctx, id)
 }
 
 func (r *mutationResolver) CreateTobanMember(ctx context.Context, tm models.CreateTobanMemberInput) (*models.TobanMember, error) {

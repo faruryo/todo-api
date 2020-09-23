@@ -20,11 +20,11 @@ func (r *queryResolver) TobanWariates(ctx context.Context, limit *int, offset *i
 }
 
 func (r *queryResolver) Toban(ctx context.Context, id int) (*models.Toban, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.TobanRepository.Get(ctx, id)
 }
 
 func (r *queryResolver) Tobans(ctx context.Context, limit *int, offset *int) ([]*models.Toban, error) {
-	panic(fmt.Errorf("not implemented"))
+	return r.TobanRepository.GetAll(ctx)
 }
 
 func (r *queryResolver) TobanMember(ctx context.Context, id int) (*models.TobanMember, error) {

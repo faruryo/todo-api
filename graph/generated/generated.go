@@ -110,7 +110,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateTobanWariate(ctx context.Context, tw models.CreateTobanWariateInput) (*models.TobanWariate, error)
 	CreateToban(ctx context.Context, toban models.CreateTobanInput) (*models.Toban, error)
-	DeleteToban(ctx context.Context, id int) (*models.Toban, error)
+	DeleteToban(ctx context.Context, id int) (bool, error)
 	CreateTobanMember(ctx context.Context, tm models.CreateTobanMemberInput) (*models.TobanMember, error)
 	CreateMember(ctx context.Context, member models.CreateMemberInput) (*models.Member, error)
 }
@@ -592,7 +592,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
   createTobanWariate(tw: CreateTobanWariateInput!): TobanWariate!
 
   createToban(toban: CreateTobanInput!): Toban!
-  deleteToban(id: Int!): Toban!
+  deleteToban(id: Int!): Boolean!
 
   createTobanMember(tm: CreateTobanMemberInput!): TobanMember!
 
@@ -679,8 +679,6 @@ input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Crea
 	DeadlineHour: Int!
 	DeadlineDay:  String!
 	DeadlineWeek: Int!
-
-    tobanMemberSequence: Int!
 }
 `, BuiltIn: false},
 	{Name: "schema/types/toban_member.graphql", Input: `type TobanMember @goModel(model: "github.com/faruryo/toban-api/models.TobanMember") {
@@ -1307,9 +1305,9 @@ func (ec *executionContext) _Mutation_deleteToban(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.Toban)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNToban2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐToban(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createTobanMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3826,14 +3824,6 @@ func (ec *executionContext) unmarshalInputCreateTobanInput(ctx context.Context, 
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeek"))
 			it.DeadlineWeek, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "tobanMemberSequence":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tobanMemberSequence"))
-			it.TobanMemberSequence, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
