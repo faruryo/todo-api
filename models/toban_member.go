@@ -3,18 +3,18 @@ package models
 import "time"
 
 type TobanMember struct {
-	ID int `json:"id"`
+	ID uint `json:"id"`
 
-	TobanID  int `json:"tobanID"`
-	Sequence int `json:"sequence"`
-	MemberID int `json:"memberID"`
+	TobanID  uint `json:"tobanID"`
+	Sequence uint `json:"sequence"`
+	MemberID uint `json:"memberID"`
 
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type CreateTobanMemberInput struct {
-	TobanID  int `json:"tobanID"`
-	Sequence int `json:"sequence"`
-	MemberID int `json:"memberID"`
+	TobanID  uint `json:"tobanID"`
+	Sequence uint `json:"sequence"`
+	MemberID uint `json:"memberID"`
 }

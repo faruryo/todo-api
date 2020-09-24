@@ -3,7 +3,8 @@ package models
 import "time"
 
 type Member struct {
-	ID      int    `json:"id"`
+	ID uint `json:"id"`
+
 	SlackID string `json:"slackID"`
 
 	Name string `json:"name"`

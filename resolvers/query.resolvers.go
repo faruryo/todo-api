@@ -11,7 +11,7 @@ import (
 	"github.com/faruryo/toban-api/models"
 )
 
-func (r *queryResolver) TobanWariate(ctx context.Context, id int) (*models.TobanWariate, error) {
+func (r *queryResolver) TobanWariate(ctx context.Context, id uint) (*models.TobanWariate, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -19,7 +19,7 @@ func (r *queryResolver) TobanWariates(ctx context.Context, limit *int, offset *i
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Toban(ctx context.Context, id int) (*models.Toban, error) {
+func (r *queryResolver) Toban(ctx context.Context, id uint) (*models.Toban, error) {
 	return r.TobanRepository.Get(ctx, id)
 }
 
@@ -27,7 +27,7 @@ func (r *queryResolver) Tobans(ctx context.Context, limit *int, offset *int) ([]
 	return r.TobanRepository.GetAll(ctx)
 }
 
-func (r *queryResolver) TobanMember(ctx context.Context, id int) (*models.TobanMember, error) {
+func (r *queryResolver) TobanMember(ctx context.Context, id uint) (*models.TobanMember, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -35,7 +35,7 @@ func (r *queryResolver) TobanMembers(ctx context.Context, limit *int, offset *in
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Member(ctx context.Context, id int) (*models.Member, error) {
+func (r *queryResolver) Member(ctx context.Context, id uint) (*models.Member, error) {
 	member, ok := r.members[id]
 	if !ok {
 		return nil, fmt.Errorf("member %d does not exist", id)

@@ -54,29 +54,30 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMember       func(childComplexity int, member models.CreateMemberInput) int
-		CreateToban        func(childComplexity int, toban models.CreateTobanInput) int
-		CreateTobanMember  func(childComplexity int, tm models.CreateTobanMemberInput) int
-		CreateTobanWariate func(childComplexity int, tw models.CreateTobanWariateInput) int
-		DeleteToban        func(childComplexity int, id int) int
+		CreateMember       func(childComplexity int, input models.CreateMemberInput) int
+		CreateToban        func(childComplexity int, input models.CreateTobanInput) int
+		CreateTobanMember  func(childComplexity int, input models.CreateTobanMemberInput) int
+		CreateTobanWariate func(childComplexity int, input models.CreateTobanWariateInput) int
+		DeleteToban        func(childComplexity int, id uint) int
+		UpdateToban        func(childComplexity int, input models.UpdateTobanInput) int
 	}
 
 	Query struct {
-		Member        func(childComplexity int, id int) int
+		Member        func(childComplexity int, id uint) int
 		Members       func(childComplexity int, limit *int, offset *int) int
-		Toban         func(childComplexity int, id int) int
-		TobanMember   func(childComplexity int, id int) int
+		Toban         func(childComplexity int, id uint) int
+		TobanMember   func(childComplexity int, id uint) int
 		TobanMembers  func(childComplexity int, limit *int, offset *int) int
-		TobanWariate  func(childComplexity int, id int) int
+		TobanWariate  func(childComplexity int, id uint) int
 		TobanWariates func(childComplexity int, limit *int, offset *int) int
 		Tobans        func(childComplexity int, limit *int, offset *int) int
 	}
 
 	Toban struct {
 		CreatedAt           func(childComplexity int) int
-		DeadlineDay         func(childComplexity int) int
 		DeadlineHour        func(childComplexity int) int
 		DeadlineWeek        func(childComplexity int) int
+		DeadlineWeekDay     func(childComplexity int) int
 		Description         func(childComplexity int) int
 		Enabled             func(childComplexity int) int
 		ID                  func(childComplexity int) int
@@ -108,20 +109,21 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateTobanWariate(ctx context.Context, tw models.CreateTobanWariateInput) (*models.TobanWariate, error)
-	CreateToban(ctx context.Context, toban models.CreateTobanInput) (*models.Toban, error)
-	DeleteToban(ctx context.Context, id int) (bool, error)
-	CreateTobanMember(ctx context.Context, tm models.CreateTobanMemberInput) (*models.TobanMember, error)
-	CreateMember(ctx context.Context, member models.CreateMemberInput) (*models.Member, error)
+	CreateTobanWariate(ctx context.Context, input models.CreateTobanWariateInput) (*models.TobanWariate, error)
+	CreateToban(ctx context.Context, input models.CreateTobanInput) (*models.Toban, error)
+	DeleteToban(ctx context.Context, id uint) (bool, error)
+	UpdateToban(ctx context.Context, input models.UpdateTobanInput) (*models.Toban, error)
+	CreateTobanMember(ctx context.Context, input models.CreateTobanMemberInput) (*models.TobanMember, error)
+	CreateMember(ctx context.Context, input models.CreateMemberInput) (*models.Member, error)
 }
 type QueryResolver interface {
-	TobanWariate(ctx context.Context, id int) (*models.TobanWariate, error)
+	TobanWariate(ctx context.Context, id uint) (*models.TobanWariate, error)
 	TobanWariates(ctx context.Context, limit *int, offset *int) ([]*models.TobanWariate, error)
-	Toban(ctx context.Context, id int) (*models.Toban, error)
+	Toban(ctx context.Context, id uint) (*models.Toban, error)
 	Tobans(ctx context.Context, limit *int, offset *int) ([]*models.Toban, error)
-	TobanMember(ctx context.Context, id int) (*models.TobanMember, error)
+	TobanMember(ctx context.Context, id uint) (*models.TobanMember, error)
 	TobanMembers(ctx context.Context, limit *int, offset *int) ([]*models.TobanMember, error)
-	Member(ctx context.Context, id int) (*models.Member, error)
+	Member(ctx context.Context, id uint) (*models.Member, error)
 	Members(ctx context.Context, limit *int, offset *int) ([]*models.Member, error)
 }
 type TobanMemberResolver interface {
@@ -190,7 +192,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMember(childComplexity, args["member"].(models.CreateMemberInput)), true
+		return e.complexity.Mutation.CreateMember(childComplexity, args["input"].(models.CreateMemberInput)), true
 
 	case "Mutation.createToban":
 		if e.complexity.Mutation.CreateToban == nil {
@@ -202,7 +204,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateToban(childComplexity, args["toban"].(models.CreateTobanInput)), true
+		return e.complexity.Mutation.CreateToban(childComplexity, args["input"].(models.CreateTobanInput)), true
 
 	case "Mutation.createTobanMember":
 		if e.complexity.Mutation.CreateTobanMember == nil {
@@ -214,7 +216,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateTobanMember(childComplexity, args["tm"].(models.CreateTobanMemberInput)), true
+		return e.complexity.Mutation.CreateTobanMember(childComplexity, args["input"].(models.CreateTobanMemberInput)), true
 
 	case "Mutation.createTobanWariate":
 		if e.complexity.Mutation.CreateTobanWariate == nil {
@@ -226,7 +228,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateTobanWariate(childComplexity, args["tw"].(models.CreateTobanWariateInput)), true
+		return e.complexity.Mutation.CreateTobanWariate(childComplexity, args["input"].(models.CreateTobanWariateInput)), true
 
 	case "Mutation.deleteToban":
 		if e.complexity.Mutation.DeleteToban == nil {
@@ -238,7 +240,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteToban(childComplexity, args["id"].(int)), true
+		return e.complexity.Mutation.DeleteToban(childComplexity, args["id"].(uint)), true
+
+	case "Mutation.updateToban":
+		if e.complexity.Mutation.UpdateToban == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateToban_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateToban(childComplexity, args["input"].(models.UpdateTobanInput)), true
 
 	case "Query.member":
 		if e.complexity.Query.Member == nil {
@@ -250,7 +264,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Member(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Member(childComplexity, args["id"].(uint)), true
 
 	case "Query.members":
 		if e.complexity.Query.Members == nil {
@@ -274,7 +288,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Toban(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Toban(childComplexity, args["id"].(uint)), true
 
 	case "Query.tobanMember":
 		if e.complexity.Query.TobanMember == nil {
@@ -286,7 +300,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.TobanMember(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.TobanMember(childComplexity, args["id"].(uint)), true
 
 	case "Query.tobanMembers":
 		if e.complexity.Query.TobanMembers == nil {
@@ -310,7 +324,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.TobanWariate(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.TobanWariate(childComplexity, args["id"].(uint)), true
 
 	case "Query.tobanWariates":
 		if e.complexity.Query.TobanWariates == nil {
@@ -343,13 +357,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Toban.CreatedAt(childComplexity), true
 
-	case "Toban.DeadlineDay":
-		if e.complexity.Toban.DeadlineDay == nil {
-			break
-		}
-
-		return e.complexity.Toban.DeadlineDay(childComplexity), true
-
 	case "Toban.DeadlineHour":
 		if e.complexity.Toban.DeadlineHour == nil {
 			break
@@ -363,6 +370,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Toban.DeadlineWeek(childComplexity), true
+
+	case "Toban.DeadlineWeekDay":
+		if e.complexity.Toban.DeadlineWeekDay == nil {
+			break
+		}
+
+		return e.complexity.Toban.DeadlineWeekDay(childComplexity), true
 
 	case "Toban.description":
 		if e.complexity.Toban.Description == nil {
@@ -589,27 +603,28 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
     | FIELD_DEFINITION
 `, BuiltIn: false},
 	{Name: "schema/mutation.graphql", Input: `type Mutation {
-  createTobanWariate(tw: CreateTobanWariateInput!): TobanWariate!
+  createTobanWariate(input: CreateTobanWariateInput!): TobanWariate!
 
-  createToban(toban: CreateTobanInput!): Toban!
-  deleteToban(id: Int!): Boolean!
+  createToban(input: CreateTobanInput!): Toban!
+  deleteToban(id: ID!): Boolean!
+  updateToban(input: UpdateTobanInput!): Toban!
 
-  createTobanMember(tm: CreateTobanMemberInput!): TobanMember!
+  createTobanMember(input: CreateTobanMemberInput!): TobanMember!
 
-  createMember(member: CreateMemberInput!): Member!
+  createMember(input: CreateMemberInput!): Member!
 }
 `, BuiltIn: false},
 	{Name: "schema/query.graphql", Input: `type Query {
-    tobanWariate(id: Int!): TobanWariate
+    tobanWariate(id: ID!): TobanWariate
     tobanWariates(limit: Int, offset: Int): [TobanWariate!]!
 
-    toban(id: Int!): Toban
+    toban(id: ID!): Toban
     tobans(limit: Int, offset: Int): [Toban!]!
 
-    tobanMember(id: Int!): TobanMember
+    tobanMember(id: ID!): TobanMember
     tobanMembers(limit: Int, offset: Int): [TobanMember!]!
 
-    member(id: Int!): Member
+    member(id: ID!): Member
     members(limit: Int, offset: Int): [Member!]!
 }
 `, BuiltIn: false},
@@ -632,14 +647,16 @@ scalar Any
 # 	Size     int64
 # }
 scalar Upload
-`, BuiltIn: false},
+
+scalar Uint`, BuiltIn: false},
 	{Name: "schema/schema.graphql", Input: `schema {
     query: Query
     mutation: Mutation
 }
 `, BuiltIn: false},
 	{Name: "schema/types/member.graphql", Input: `type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
-    id: Int!
+    id: ID!
+
     slackID: String!
 
     name: String!
@@ -654,18 +671,19 @@ input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.Cre
 }
 `, BuiltIn: false},
 	{Name: "schema/types/toban.graphql", Input: `type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
-    id: Int!
+    id: ID!
+
     name: String!
     description: String!
 
-	Interval:     String!
-	DeadlineHour: Int!
-	DeadlineDay:  String!
-	DeadlineWeek: Int!
+	Interval:     Interval!
+	DeadlineHour: Uint!
+	DeadlineWeekDay:  WeekDay!
+	DeadlineWeek: Uint!
 
     enabled: Boolean!
 
-    tobanMemberSequence: Int!
+    tobanMemberSequence: Uint!
 
     createdAt: Time!
     updatedAt: Time!
@@ -675,17 +693,47 @@ input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Crea
     name: String!
     description: String!
 
-	Interval:     String!
-	DeadlineHour: Int!
-	DeadlineDay:  String!
-	DeadlineWeek: Int!
+	Interval:     Interval!
+	DeadlineHour: Uint!
+	DeadlineWeekDay:  WeekDay!
+	DeadlineWeek: Uint!
 }
-`, BuiltIn: false},
+
+input UpdateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.UpdateTobanInput") {
+    id: ID!
+    name: String
+    description: String
+
+	Interval:     Interval
+	DeadlineHour: Uint
+	DeadlineWeekDay:  WeekDay
+	DeadlineWeek: Uint
+
+    enabled: Boolean
+
+    tobanMemberSequence: Uint
+}
+
+enum Interval @goModel(model: "github.com/faruryo/toban-api/models.Interval") {
+    DAILY
+    WEEKLY
+    MONTHLY
+}
+
+enum WeekDay @goModel(model: "github.com/faruryo/toban-api/models.WeekDay") {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
+}`, BuiltIn: false},
 	{Name: "schema/types/toban_member.graphql", Input: `type TobanMember @goModel(model: "github.com/faruryo/toban-api/models.TobanMember") {
-    id: Int!
+    id: ID!
 
     tobanID: Toban! @goField(forceResolver: true)
-    sequence: Int!
+    sequence: Uint!
     memberID: Member! @goField(forceResolver: true)
 
     createdAt: Time!
@@ -693,17 +741,17 @@ input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Crea
 }
 
 input CreateTobanMemberInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanMemberInput") {
-    tobanID: Int!
-    sequence: Int!
-    memberID: Int!
+    tobanID: ID!
+    sequence: Uint!
+    memberID: ID!
 }
 `, BuiltIn: false},
 	{Name: "schema/types/toban_wariate.graphql", Input: `type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWariate") {
-    id: Int!
+    id: ID!
 
-	tobanID: Int!
-	tobanSequence: Int!
-	memberID: Int!
+	tobanID: ID!
+	tobanSequence: Uint!
+	memberID: ID!
 
 	isDone: Boolean
 	doneAt: Time
@@ -713,9 +761,9 @@ input CreateTobanMemberInput @goModel(model: "github.com/faruryo/toban-api/model
 }
 
 input CreateTobanWariateInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanWariateInput") {
-    tobanID: Int!
-    tobanSequence: Int!
-    memberID: Int!
+    tobanID: ID!
+    tobanSequence: Uint!
+    memberID: ID!
 }
 `, BuiltIn: false},
 }
@@ -729,14 +777,14 @@ func (ec *executionContext) field_Mutation_createMember_args(ctx context.Context
 	var err error
 	args := map[string]interface{}{}
 	var arg0 models.CreateMemberInput
-	if tmp, ok := rawArgs["member"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("member"))
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateMemberInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐCreateMemberInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["member"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -744,14 +792,14 @@ func (ec *executionContext) field_Mutation_createTobanMember_args(ctx context.Co
 	var err error
 	args := map[string]interface{}{}
 	var arg0 models.CreateTobanMemberInput
-	if tmp, ok := rawArgs["tm"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tm"))
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateTobanMemberInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐCreateTobanMemberInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["tm"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -759,14 +807,14 @@ func (ec *executionContext) field_Mutation_createTobanWariate_args(ctx context.C
 	var err error
 	args := map[string]interface{}{}
 	var arg0 models.CreateTobanWariateInput
-	if tmp, ok := rawArgs["tw"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tw"))
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateTobanWariateInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐCreateTobanWariateInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["tw"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -774,29 +822,44 @@ func (ec *executionContext) field_Mutation_createToban_args(ctx context.Context,
 	var err error
 	args := map[string]interface{}{}
 	var arg0 models.CreateTobanInput
-	if tmp, ok := rawArgs["toban"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("toban"))
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCreateTobanInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐCreateTobanInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["toban"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
 func (ec *executionContext) field_Mutation_deleteToban_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 uint
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateToban_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.UpdateTobanInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateTobanInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐUpdateTobanInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -818,10 +881,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_member_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 uint
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -857,10 +920,10 @@ func (ec *executionContext) field_Query_members_args(ctx context.Context, rawArg
 func (ec *executionContext) field_Query_tobanMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 uint
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -896,10 +959,10 @@ func (ec *executionContext) field_Query_tobanMembers_args(ctx context.Context, r
 func (ec *executionContext) field_Query_tobanWariate_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 uint
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -935,10 +998,10 @@ func (ec *executionContext) field_Query_tobanWariates_args(ctx context.Context, 
 func (ec *executionContext) field_Query_toban_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 uint
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1039,9 +1102,9 @@ func (ec *executionContext) _Member_id(ctx context.Context, field graphql.Collec
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_slackID(ctx context.Context, field graphql.CollectedField, obj *models.Member) (ret graphql.Marshaler) {
@@ -1209,7 +1272,7 @@ func (ec *executionContext) _Mutation_createTobanWariate(ctx context.Context, fi
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTobanWariate(rctx, args["tw"].(models.CreateTobanWariateInput))
+		return ec.resolvers.Mutation().CreateTobanWariate(rctx, args["input"].(models.CreateTobanWariateInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1251,7 +1314,7 @@ func (ec *executionContext) _Mutation_createToban(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateToban(rctx, args["toban"].(models.CreateTobanInput))
+		return ec.resolvers.Mutation().CreateToban(rctx, args["input"].(models.CreateTobanInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1293,7 +1356,7 @@ func (ec *executionContext) _Mutation_deleteToban(ctx context.Context, field gra
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteToban(rctx, args["id"].(int))
+		return ec.resolvers.Mutation().DeleteToban(rctx, args["id"].(uint))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1308,6 +1371,48 @@ func (ec *executionContext) _Mutation_deleteToban(ctx context.Context, field gra
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateToban(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateToban_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateToban(rctx, args["input"].(models.UpdateTobanInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Toban)
+	fc.Result = res
+	return ec.marshalNToban2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐToban(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createTobanMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1335,7 +1440,7 @@ func (ec *executionContext) _Mutation_createTobanMember(ctx context.Context, fie
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTobanMember(rctx, args["tm"].(models.CreateTobanMemberInput))
+		return ec.resolvers.Mutation().CreateTobanMember(rctx, args["input"].(models.CreateTobanMemberInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1377,7 +1482,7 @@ func (ec *executionContext) _Mutation_createMember(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateMember(rctx, args["member"].(models.CreateMemberInput))
+		return ec.resolvers.Mutation().CreateMember(rctx, args["input"].(models.CreateMemberInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1419,7 +1524,7 @@ func (ec *executionContext) _Query_tobanWariate(ctx context.Context, field graph
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TobanWariate(rctx, args["id"].(int))
+		return ec.resolvers.Query().TobanWariate(rctx, args["id"].(uint))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1500,7 +1605,7 @@ func (ec *executionContext) _Query_toban(ctx context.Context, field graphql.Coll
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Toban(rctx, args["id"].(int))
+		return ec.resolvers.Query().Toban(rctx, args["id"].(uint))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1581,7 +1686,7 @@ func (ec *executionContext) _Query_tobanMember(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TobanMember(rctx, args["id"].(int))
+		return ec.resolvers.Query().TobanMember(rctx, args["id"].(uint))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1662,7 +1767,7 @@ func (ec *executionContext) _Query_member(ctx context.Context, field graphql.Col
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Member(rctx, args["id"].(int))
+		return ec.resolvers.Query().Member(rctx, args["id"].(uint))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1819,9 +1924,9 @@ func (ec *executionContext) _Toban_id(ctx context.Context, field graphql.Collect
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Toban_name(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
@@ -1924,9 +2029,9 @@ func (ec *executionContext) _Toban_Interval(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(models.Interval)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Toban_DeadlineHour(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
@@ -1959,12 +2064,12 @@ func (ec *executionContext) _Toban_DeadlineHour(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Toban_DeadlineDay(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
+func (ec *executionContext) _Toban_DeadlineWeekDay(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1982,7 +2087,7 @@ func (ec *executionContext) _Toban_DeadlineDay(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.DeadlineDay, nil
+		return obj.DeadlineWeekDay, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1994,9 +2099,9 @@ func (ec *executionContext) _Toban_DeadlineDay(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(models.WeekDay)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Toban_DeadlineWeek(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
@@ -2029,9 +2134,9 @@ func (ec *executionContext) _Toban_DeadlineWeek(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Toban_enabled(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
@@ -2099,9 +2204,9 @@ func (ec *executionContext) _Toban_tobanMemberSequence(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Toban_createdAt(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
@@ -2204,9 +2309,9 @@ func (ec *executionContext) _TobanMember_id(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanMember_tobanID(ctx context.Context, field graphql.CollectedField, obj *models.TobanMember) (ret graphql.Marshaler) {
@@ -2274,9 +2379,9 @@ func (ec *executionContext) _TobanMember_sequence(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanMember_memberID(ctx context.Context, field graphql.CollectedField, obj *models.TobanMember) (ret graphql.Marshaler) {
@@ -2414,9 +2519,9 @@ func (ec *executionContext) _TobanWariate_id(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanWariate_tobanID(ctx context.Context, field graphql.CollectedField, obj *models.TobanWariate) (ret graphql.Marshaler) {
@@ -2449,9 +2554,9 @@ func (ec *executionContext) _TobanWariate_tobanID(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanWariate_tobanSequence(ctx context.Context, field graphql.CollectedField, obj *models.TobanWariate) (ret graphql.Marshaler) {
@@ -2484,9 +2589,9 @@ func (ec *executionContext) _TobanWariate_tobanSequence(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanWariate_memberID(ctx context.Context, field graphql.CollectedField, obj *models.TobanWariate) (ret graphql.Marshaler) {
@@ -2519,9 +2624,9 @@ func (ec *executionContext) _TobanWariate_memberID(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(uint)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNID2uint(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _TobanWariate_isDone(ctx context.Context, field graphql.CollectedField, obj *models.TobanWariate) (ret graphql.Marshaler) {
@@ -3799,7 +3904,7 @@ func (ec *executionContext) unmarshalInputCreateTobanInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Interval"))
-			it.Interval, err = ec.unmarshalNString2string(ctx, v)
+			it.Interval, err = ec.unmarshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3807,15 +3912,15 @@ func (ec *executionContext) unmarshalInputCreateTobanInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineHour"))
-			it.DeadlineHour, err = ec.unmarshalNInt2int(ctx, v)
+			it.DeadlineHour, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineDay":
+		case "DeadlineWeekDay":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineDay"))
-			it.DeadlineDay, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeekDay"))
+			it.DeadlineWeekDay, err = ec.unmarshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3823,7 +3928,7 @@ func (ec *executionContext) unmarshalInputCreateTobanInput(ctx context.Context, 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeek"))
-			it.DeadlineWeek, err = ec.unmarshalNInt2int(ctx, v)
+			it.DeadlineWeek, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3843,7 +3948,7 @@ func (ec *executionContext) unmarshalInputCreateTobanMemberInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tobanID"))
-			it.TobanID, err = ec.unmarshalNInt2int(ctx, v)
+			it.TobanID, err = ec.unmarshalNID2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3851,7 +3956,7 @@ func (ec *executionContext) unmarshalInputCreateTobanMemberInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sequence"))
-			it.Sequence, err = ec.unmarshalNInt2int(ctx, v)
+			it.Sequence, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3859,7 +3964,7 @@ func (ec *executionContext) unmarshalInputCreateTobanMemberInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberID"))
-			it.MemberID, err = ec.unmarshalNInt2int(ctx, v)
+			it.MemberID, err = ec.unmarshalNID2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3879,7 +3984,7 @@ func (ec *executionContext) unmarshalInputCreateTobanWariateInput(ctx context.Co
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tobanID"))
-			it.TobanID, err = ec.unmarshalNInt2int(ctx, v)
+			it.TobanID, err = ec.unmarshalNID2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3887,7 +3992,7 @@ func (ec *executionContext) unmarshalInputCreateTobanWariateInput(ctx context.Co
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tobanSequence"))
-			it.TobanSequence, err = ec.unmarshalNInt2int(ctx, v)
+			it.TobanSequence, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3895,7 +4000,91 @@ func (ec *executionContext) unmarshalInputCreateTobanWariateInput(ctx context.Co
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("memberID"))
-			it.MemberID, err = ec.unmarshalNInt2int(ctx, v)
+			it.MemberID, err = ec.unmarshalNID2uint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateTobanInput(ctx context.Context, obj interface{}) (models.UpdateTobanInput, error) {
+	var it models.UpdateTobanInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Interval":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Interval"))
+			it.Interval, err = ec.unmarshalOInterval2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "DeadlineHour":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineHour"))
+			it.DeadlineHour, err = ec.unmarshalOUint2ᚖuint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "DeadlineWeekDay":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeekDay"))
+			it.DeadlineWeekDay, err = ec.unmarshalOWeekDay2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "DeadlineWeek":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeek"))
+			it.DeadlineWeek, err = ec.unmarshalOUint2ᚖuint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "enabled":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("enabled"))
+			it.Enabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "tobanMemberSequence":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tobanMemberSequence"))
+			it.TobanMemberSequence, err = ec.unmarshalOUint2ᚖuint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3987,6 +4176,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "deleteToban":
 			out.Values[i] = ec._Mutation_deleteToban(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateToban":
+			out.Values[i] = ec._Mutation_updateToban(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4177,8 +4371,8 @@ func (ec *executionContext) _Toban(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "DeadlineDay":
-			out.Values[i] = ec._Toban_DeadlineDay(ctx, field, obj)
+		case "DeadlineWeekDay":
+			out.Values[i] = ec._Toban_DeadlineWeekDay(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4624,19 +4818,29 @@ func (ec *executionContext) unmarshalNCreateTobanWariateInput2githubᚗcomᚋfar
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
-	res, err := graphql.UnmarshalInt(v)
+func (ec *executionContext) unmarshalNID2uint(ctx context.Context, v interface{}) (uint, error) {
+	res, err := models.UnmarshalUint(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
-	res := graphql.MarshalInt(v)
+func (ec *executionContext) marshalNID2uint(ctx context.Context, sel ast.SelectionSet, v uint) graphql.Marshaler {
+	res := models.MarshalUint(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx context.Context, v interface{}) (models.Interval, error) {
+	var res models.Interval
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx context.Context, sel ast.SelectionSet, v models.Interval) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNMember2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐMember(ctx context.Context, sel ast.SelectionSet, v models.Member) graphql.Marshaler {
@@ -4871,6 +5075,36 @@ func (ec *executionContext) marshalNTobanWariate2ᚖgithubᚗcomᚋfaruryoᚋtob
 		return graphql.Null
 	}
 	return ec._TobanWariate(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUint2uint(ctx context.Context, v interface{}) (uint, error) {
+	res, err := models.UnmarshalUint(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUint2uint(ctx context.Context, sel ast.SelectionSet, v uint) graphql.Marshaler {
+	res := models.MarshalUint(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateTobanInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐUpdateTobanInput(ctx context.Context, v interface{}) (models.UpdateTobanInput, error) {
+	res, err := ec.unmarshalInputUpdateTobanInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx context.Context, v interface{}) (models.WeekDay, error) {
+	var res models.WeekDay
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx context.Context, sel ast.SelectionSet, v models.WeekDay) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5141,6 +5375,22 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return graphql.MarshalInt(*v)
 }
 
+func (ec *executionContext) unmarshalOInterval2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx context.Context, v interface{}) (*models.Interval, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(models.Interval)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInterval2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx context.Context, sel ast.SelectionSet, v *models.Interval) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
 func (ec *executionContext) marshalOMember2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐMember(ctx context.Context, sel ast.SelectionSet, v *models.Member) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -5236,6 +5486,37 @@ func (ec *executionContext) marshalOTobanWariate2ᚖgithubᚗcomᚋfaruryoᚋtob
 		return graphql.Null
 	}
 	return ec._TobanWariate(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOUint2ᚖuint(ctx context.Context, v interface{}) (*uint, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := models.UnmarshalUint(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUint2ᚖuint(ctx context.Context, sel ast.SelectionSet, v *uint) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return models.MarshalUint(*v)
+}
+
+func (ec *executionContext) unmarshalOWeekDay2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx context.Context, v interface{}) (*models.WeekDay, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(models.WeekDay)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOWeekDay2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx context.Context, sel ast.SelectionSet, v *models.WeekDay) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

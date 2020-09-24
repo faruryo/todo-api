@@ -12,19 +12,19 @@ import (
 	"github.com/faruryo/toban-api/models"
 )
 
-func (r *mutationResolver) CreateTobanWariate(ctx context.Context, tw models.CreateTobanWariateInput) (*models.TobanWariate, error) {
+func (r *mutationResolver) CreateTobanWariate(ctx context.Context, input models.CreateTobanWariateInput) (*models.TobanWariate, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateToban(ctx context.Context, toban models.CreateTobanInput) (*models.Toban, error) {
+func (r *mutationResolver) CreateToban(ctx context.Context, input models.CreateTobanInput) (*models.Toban, error) {
 	t := &models.Toban{
-		Name:        toban.Name,
-		Description: toban.Description,
+		Name:        input.Name,
+		Description: input.Description,
 
-		Interval:     toban.Interval,
-		DeadlineHour: toban.DeadlineHour,
-		DeadlineDay:  toban.DeadlineDay,
-		DeadlineWeek: toban.DeadlineWeek,
+		Interval:        input.Interval,
+		DeadlineHour:    input.DeadlineHour,
+		DeadlineWeekDay: input.DeadlineWeekDay,
+		DeadlineWeek:    input.DeadlineWeek,
 
 		Enabled: true,
 
@@ -37,28 +37,61 @@ func (r *mutationResolver) CreateToban(ctx context.Context, toban models.CreateT
 	return r.TobanRepository.Create(ctx, t)
 }
 
-func (r *mutationResolver) DeleteToban(ctx context.Context, id int) (bool, error) {
+func (r *mutationResolver) DeleteToban(ctx context.Context, id uint) (bool, error) {
 	return r.TobanRepository.Delete(ctx, id)
 }
 
-func (r *mutationResolver) CreateTobanMember(ctx context.Context, tm models.CreateTobanMemberInput) (*models.TobanMember, error) {
+func (r *mutationResolver) UpdateToban(ctx context.Context, input models.UpdateTobanInput) (*models.Toban, error) {
+	t, err := r.TobanRepository.Get(ctx, input.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Name != nil {
+		t.Name = *input.Name
+	}
+	if input.Description != nil {
+		t.Description = *input.Description
+	}
+	if input.Interval != nil {
+		t.Interval = *input.Interval
+	}
+	if input.DeadlineHour != nil {
+		t.DeadlineHour = *input.DeadlineHour
+	}
+	if input.DeadlineWeekDay != nil {
+		t.DeadlineWeekDay = *input.DeadlineWeekDay
+	}
+	if input.DeadlineWeek != nil {
+		t.DeadlineWeek = *input.DeadlineWeek
+	}
+	if input.Enabled != nil {
+		t.Enabled = *input.Enabled
+	}
+	if input.TobanMemberSequence != nil {
+		t.TobanMemberSequence = *input.TobanMemberSequence
+	}
+	return r.TobanRepository.Update(ctx, t)
+}
+
+func (r *mutationResolver) CreateTobanMember(ctx context.Context, input models.CreateTobanMemberInput) (*models.TobanMember, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) CreateMember(ctx context.Context, member models.CreateMemberInput) (*models.Member, error) {
-	id := len(r.members)
+func (r *mutationResolver) CreateMember(ctx context.Context, input models.CreateMemberInput) (*models.Member, error) {
+	id := uint(len(r.members))
 	m := &models.Member{
 		ID:      id,
-		SlackID: member.SlackID,
+		SlackID: input.SlackID,
 
-		Name: member.Name,
+		Name: input.Name,
 
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	if r.members == nil {
-		r.members = map[int]*models.Member{}
+		r.members = map[uint]*models.Member{}
 	}
 	r.members[id] = m
 	return m, nil

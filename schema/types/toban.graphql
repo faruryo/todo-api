@@ -1,16 +1,17 @@
 type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
-    id: Int!
+    id: ID!
+
     name: String!
     description: String!
 
-	Interval:     String!
-	DeadlineHour: Int!
-	DeadlineDay:  String!
-	DeadlineWeek: Int!
+	Interval:     Interval!
+	DeadlineHour: Uint!
+	DeadlineWeekDay:  WeekDay!
+	DeadlineWeek: Uint!
 
     enabled: Boolean!
 
-    tobanMemberSequence: Int!
+    tobanMemberSequence: Uint!
 
     createdAt: Time!
     updatedAt: Time!
@@ -20,8 +21,39 @@ input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Crea
     name: String!
     description: String!
 
-	Interval:     String!
-	DeadlineHour: Int!
-	DeadlineDay:  String!
-	DeadlineWeek: Int!
+	Interval:     Interval!
+	DeadlineHour: Uint!
+	DeadlineWeekDay:  WeekDay!
+	DeadlineWeek: Uint!
+}
+
+input UpdateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.UpdateTobanInput") {
+    id: ID!
+    name: String
+    description: String
+
+	Interval:     Interval
+	DeadlineHour: Uint
+	DeadlineWeekDay:  WeekDay
+	DeadlineWeek: Uint
+
+    enabled: Boolean
+
+    tobanMemberSequence: Uint
+}
+
+enum Interval @goModel(model: "github.com/faruryo/toban-api/models.Interval") {
+    DAILY
+    WEEKLY
+    MONTHLY
+}
+
+enum WeekDay @goModel(model: "github.com/faruryo/toban-api/models.WeekDay") {
+    MONDAY
+    TUESDAY
+    WEDNESDAY
+    THURSDAY
+    FRIDAY
+    SATURDAY
+    SUNDAY
 }

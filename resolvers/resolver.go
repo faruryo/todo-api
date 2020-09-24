@@ -14,6 +14,6 @@ import (
 // Resolver データストアを持っているResolver構造体
 type Resolver struct {
 	tobans          []*models.Toban
-	members         map[int]*models.Member
+	members         map[uint]*models.Member
 	TobanRepository repositories.TobanRepository
 }

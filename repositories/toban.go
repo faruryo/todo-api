@@ -9,11 +9,11 @@ import (
 )
 
 type TobanRepository interface {
-	Get(ctx context.Context, id int) (*models.Toban, error)
+	Get(ctx context.Context, id uint) (*models.Toban, error)
 	GetAll(ctx context.Context) ([]*models.Toban, error)
 	Create(ctx context.Context, toban *models.Toban) (*models.Toban, error)
 	Update(ctx context.Context, toban *models.Toban) (*models.Toban, error)
-	Delete(ctx context.Context, id int) (bool, error)
+	Delete(ctx context.Context, id uint) (bool, error)
 }
 
 func NewTobanRepository(db *gorm.DB) TobanRepository {
@@ -31,7 +31,7 @@ type tobanRepository struct {
 	db *gorm.DB
 }
 
-func (r tobanRepository) Get(ctx context.Context, id int) (*models.Toban, error) {
+func (r tobanRepository) Get(ctx context.Context, id uint) (*models.Toban, error) {
 	var toban models.Toban
 	if err := r.db.First(&toban, id).Error; err != nil {
 		return nil, err
@@ -62,10 +62,18 @@ func (r tobanRepository) Create(ctx context.Context, toban *models.Toban) (*mode
 }
 
 func (r tobanRepository) Update(ctx context.Context, toban *models.Toban) (*models.Toban, error) {
-	panic("not implemented") // TODO: Implement
+	if toban.ID == 0 {
+		return nil, errors.New("bad request: ID must not be 0")
+	}
+
+	if err := r.db.Save(&toban).Error; err != nil {
+		return nil, err
+	}
+
+	return toban, nil
 }
 
-func (r tobanRepository) Delete(ctx context.Context, id int) (bool, error) {
+func (r tobanRepository) Delete(ctx context.Context, id uint) (bool, error) {
 	if id == 0 {
 		return false, errors.New("bad request: ID must not be 0")
 	}

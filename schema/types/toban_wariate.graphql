@@ -1,9 +1,9 @@
 type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWariate") {
-    id: Int!
+    id: ID!
 
-	tobanID: Int!
-	tobanSequence: Int!
-	memberID: Int!
+	tobanID: ID!
+	tobanSequence: Uint!
+	memberID: ID!
 
 	isDone: Boolean
 	doneAt: Time
@@ -13,7 +13,7 @@ type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWari
 }
 
 input CreateTobanWariateInput @goModel(model: "github.com/faruryo/toban-api/models.CreateTobanWariateInput") {
-    tobanID: Int!
-    tobanSequence: Int!
-    memberID: Int!
+    tobanID: ID!
+    tobanSequence: Uint!
+    memberID: ID!
 }

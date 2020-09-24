@@ -3,11 +3,11 @@ package models
 import "time"
 
 type TobanWariate struct {
-	ID int `json:"id"`
+	ID uint `json:"id"`
 
-	TobanID       int `json:"tobanID"`
-	TobanSequence int `json:"sequence"`
-	MemberID      int `json:"memberID"`
+	TobanID       uint `json:"tobanID"`
+	TobanSequence uint `json:"sequence"`
+	MemberID      uint `json:"memberID"`
 
 	IsDone bool      `json:"isDone"`
 	DoneAt time.Time `json:"doneAt"`
@@ -17,7 +17,7 @@ type TobanWariate struct {
 }
 
 type CreateTobanWariateInput struct {
-	TobanID       int `json:"tobanID"`
-	TobanSequence int `json:"tobanSequence"`
-	MemberID      int `json:"memberID"`
+	TobanID       uint `json:"tobanID"`
+	TobanSequence uint `json:"tobanSequence"`
+	MemberID      uint `json:"memberID"`
 }

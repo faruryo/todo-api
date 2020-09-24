@@ -31,6 +31,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.Debug()
 
 	srv := handler.NewDefaultServer(
 		generated.NewExecutableSchema(generated.Config{

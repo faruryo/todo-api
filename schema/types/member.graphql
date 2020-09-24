@@ -1,5 +1,6 @@
 type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
-    id: Int!
+    id: ID!
+
     slackID: String!
 
     name: String!
