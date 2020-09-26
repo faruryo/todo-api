@@ -29,9 +29,6 @@ func (r *mutationResolver) CreateToban(ctx context.Context, input models.CreateT
 		Enabled: true,
 
 		TobanMemberSequence: 0,
-
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 
 	return r.TobanRepository.Create(ctx, t)
@@ -71,6 +68,8 @@ func (r *mutationResolver) UpdateToban(ctx context.Context, input models.UpdateT
 	if input.TobanMemberSequence != nil {
 		t.TobanMemberSequence = *input.TobanMemberSequence
 	}
+	t.CreatedAt = time.Time{}
+	t.UpdatedAt = time.Time{}
 	return r.TobanRepository.Update(ctx, t)
 }
 

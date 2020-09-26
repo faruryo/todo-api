@@ -357,21 +357,21 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Toban.CreatedAt(childComplexity), true
 
-	case "Toban.DeadlineHour":
+	case "Toban.deadlineHour":
 		if e.complexity.Toban.DeadlineHour == nil {
 			break
 		}
 
 		return e.complexity.Toban.DeadlineHour(childComplexity), true
 
-	case "Toban.DeadlineWeek":
+	case "Toban.deadlineWeek":
 		if e.complexity.Toban.DeadlineWeek == nil {
 			break
 		}
 
 		return e.complexity.Toban.DeadlineWeek(childComplexity), true
 
-	case "Toban.DeadlineWeekDay":
+	case "Toban.deadlineWeekDay":
 		if e.complexity.Toban.DeadlineWeekDay == nil {
 			break
 		}
@@ -399,7 +399,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Toban.ID(childComplexity), true
 
-	case "Toban.Interval":
+	case "Toban.interval":
 		if e.complexity.Toban.Interval == nil {
 			break
 		}
@@ -676,10 +676,10 @@ input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.Cre
     name: String!
     description: String!
 
-	Interval:     Interval!
-	DeadlineHour: Uint!
-	DeadlineWeekDay:  WeekDay!
-	DeadlineWeek: Uint!
+	interval:     Interval!
+	deadlineHour: Uint!
+	deadlineWeekDay:  WeekDay!
+	deadlineWeek: Uint!
 
     enabled: Boolean!
 
@@ -693,10 +693,10 @@ input CreateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Crea
     name: String!
     description: String!
 
-	Interval:     Interval!
-	DeadlineHour: Uint!
-	DeadlineWeekDay:  WeekDay!
-	DeadlineWeek: Uint!
+	interval:     Interval!
+	deadlineHour: Uint!
+	deadlineWeekDay:  WeekDay!
+	deadlineWeek: Uint!
 }
 
 input UpdateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.UpdateTobanInput") {
@@ -704,10 +704,10 @@ input UpdateTobanInput @goModel(model: "github.com/faruryo/toban-api/models.Upda
     name: String
     description: String
 
-	Interval:     Interval
-	DeadlineHour: Uint
-	DeadlineWeekDay:  WeekDay
-	DeadlineWeek: Uint
+	interval:     Interval
+	deadlineHour: Uint
+	deadlineWeekDay:  WeekDay
+	deadlineWeek: Uint
 
     enabled: Boolean
 
@@ -1999,7 +1999,7 @@ func (ec *executionContext) _Toban_description(ctx context.Context, field graphq
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Toban_Interval(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
+func (ec *executionContext) _Toban_interval(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2034,7 +2034,7 @@ func (ec *executionContext) _Toban_Interval(ctx context.Context, field graphql.C
 	return ec.marshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Toban_DeadlineHour(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
+func (ec *executionContext) _Toban_deadlineHour(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2069,7 +2069,7 @@ func (ec *executionContext) _Toban_DeadlineHour(ctx context.Context, field graph
 	return ec.marshalNUint2uint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Toban_DeadlineWeekDay(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
+func (ec *executionContext) _Toban_deadlineWeekDay(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2104,7 +2104,7 @@ func (ec *executionContext) _Toban_DeadlineWeekDay(ctx context.Context, field gr
 	return ec.marshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Toban_DeadlineWeek(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
+func (ec *executionContext) _Toban_deadlineWeek(ctx context.Context, field graphql.CollectedField, obj *models.Toban) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3900,34 +3900,34 @@ func (ec *executionContext) unmarshalInputCreateTobanInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "Interval":
+		case "interval":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Interval"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interval"))
 			it.Interval, err = ec.unmarshalNInterval2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineHour":
+		case "deadlineHour":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineHour"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineHour"))
 			it.DeadlineHour, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineWeekDay":
+		case "deadlineWeekDay":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeekDay"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineWeekDay"))
 			it.DeadlineWeekDay, err = ec.unmarshalNWeekDay2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineWeek":
+		case "deadlineWeek":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeek"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineWeek"))
 			it.DeadlineWeek, err = ec.unmarshalNUint2uint(ctx, v)
 			if err != nil {
 				return it, err
@@ -4040,34 +4040,34 @@ func (ec *executionContext) unmarshalInputUpdateTobanInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "Interval":
+		case "interval":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Interval"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interval"))
 			it.Interval, err = ec.unmarshalOInterval2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineHour":
+		case "deadlineHour":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineHour"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineHour"))
 			it.DeadlineHour, err = ec.unmarshalOUint2ᚖuint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineWeekDay":
+		case "deadlineWeekDay":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeekDay"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineWeekDay"))
 			it.DeadlineWeekDay, err = ec.unmarshalOWeekDay2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐWeekDay(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "DeadlineWeek":
+		case "deadlineWeek":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("DeadlineWeek"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadlineWeek"))
 			it.DeadlineWeek, err = ec.unmarshalOUint2ᚖuint(ctx, v)
 			if err != nil {
 				return it, err
@@ -4361,23 +4361,23 @@ func (ec *executionContext) _Toban(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Interval":
-			out.Values[i] = ec._Toban_Interval(ctx, field, obj)
+		case "interval":
+			out.Values[i] = ec._Toban_interval(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "DeadlineHour":
-			out.Values[i] = ec._Toban_DeadlineHour(ctx, field, obj)
+		case "deadlineHour":
+			out.Values[i] = ec._Toban_deadlineHour(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "DeadlineWeekDay":
-			out.Values[i] = ec._Toban_DeadlineWeekDay(ctx, field, obj)
+		case "deadlineWeekDay":
+			out.Values[i] = ec._Toban_deadlineWeekDay(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "DeadlineWeek":
-			out.Values[i] = ec._Toban_DeadlineWeek(ctx, field, obj)
+		case "deadlineWeek":
+			out.Values[i] = ec._Toban_deadlineWeek(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

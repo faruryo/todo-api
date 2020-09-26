@@ -18,3 +18,7 @@ portForward:
     resourceName: toban-api
     port: 80
     localPort: 8080
+  - resourceType: service
+    resourceName: toban-mysql
+    port: 3306
+    localPort: 33306

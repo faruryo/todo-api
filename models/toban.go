@@ -8,22 +8,22 @@ import (
 )
 
 type Toban struct {
-	ID uint `json:"id"`
+	ID uint `json:"id" gorm:"not null"`
 
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	Name        string `json:"name" gorm:"type:VARCHAR(256);not null"`
+	Description string `json:"description" gorm:"type:VARCHAR(1024);not null"`
 
-	Interval        Interval `json:"interval"`
-	DeadlineHour    uint     `json:"deadlineHour"`
-	DeadlineWeekDay WeekDay  `json:"deadlineWeekDay"`
-	DeadlineWeek    uint     `json:"deadlineWeek"`
+	Interval        Interval `json:"interval" gorm:"type:ENUM('DAILY','WEEKLY','MONTHLY');not null"`
+	DeadlineHour    uint     `json:"deadlineHour" gorm:"not null"`
+	DeadlineWeekDay WeekDay  `json:"deadlineWeekDay" gorm:"type:ENUM('MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY');not null"`
+	DeadlineWeek    uint     `json:"deadlineWeek" gorm:"not null"`
 
-	Enabled bool `json:"enabled"`
+	Enabled bool `json:"enabled" gorm:"not null"`
 
-	TobanMemberSequence uint `json:"tobanMemberSequence"`
+	TobanMemberSequence uint `json:"tobanMemberSequence" gorm:"not null"`
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt" gorm:"not null"`
+	UpdatedAt time.Time `json:"updatedAt" gorm:"not null"`
 }
 
 type CreateTobanInput struct {

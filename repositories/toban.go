@@ -19,6 +19,10 @@ type TobanRepository interface {
 func NewTobanRepository(db *gorm.DB) TobanRepository {
 	db.AutoMigrate(&models.Toban{})
 
+	return NewTobanRepositoryNoMigrate(db)
+}
+
+func NewTobanRepositoryNoMigrate(db *gorm.DB) TobanRepository {
 	return &tobanRepository{
 		db: db,
 	}
@@ -33,7 +37,12 @@ type tobanRepository struct {
 
 func (r tobanRepository) Get(ctx context.Context, id uint) (*models.Toban, error) {
 	var toban models.Toban
-	if err := r.db.First(&toban, id).Error; err != nil {
+	err := r.db.First(&toban, id).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		// return &toban, nil
+		return nil, ErrNoSuchEntity
+	}
+	if err != nil {
 		return nil, err
 	}
 
@@ -51,7 +60,13 @@ func (r tobanRepository) GetAll(ctx context.Context) ([]*models.Toban, error) {
 
 func (r tobanRepository) Create(ctx context.Context, toban *models.Toban) (*models.Toban, error) {
 	if toban.ID != 0 {
-		return nil, errors.New("bad request: ID must be 0")
+		return nil, ErrBadRequestIdMustBeZero
+	}
+	if !toban.CreatedAt.IsZero() {
+		return nil, ErrBadRequestUpdateCreatedAt
+	}
+	if !toban.UpdatedAt.IsZero() {
+		return nil, ErrBadRequestUpdateUpdatedAt
 	}
 
 	if err := r.db.Create(toban).Error; err != nil {
@@ -63,8 +78,15 @@ func (r tobanRepository) Create(ctx context.Context, toban *models.Toban) (*mode
 
 func (r tobanRepository) Update(ctx context.Context, toban *models.Toban) (*models.Toban, error) {
 	if toban.ID == 0 {
-		return nil, errors.New("bad request: ID must not be 0")
+		return nil, ErrBadRequestIdMustNotBeZero
 	}
+	if !toban.CreatedAt.IsZero() {
+		return nil, ErrBadRequestUpdateCreatedAt
+	}
+	if !toban.UpdatedAt.IsZero() {
+		return nil, ErrBadRequestUpdateUpdatedAt
+	}
+	// TODO:トランザクションで現在値からを元にアップデートするように変更する
 
 	if err := r.db.Save(&toban).Error; err != nil {
 		return nil, err
@@ -75,7 +97,7 @@ func (r tobanRepository) Update(ctx context.Context, toban *models.Toban) (*mode
 
 func (r tobanRepository) Delete(ctx context.Context, id uint) (bool, error) {
 	if id == 0 {
-		return false, errors.New("bad request: ID must not be 0")
+		return false, ErrBadRequestIdMustNotBeZero
 	}
 
 	var toban models.Toban
