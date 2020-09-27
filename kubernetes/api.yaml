@@ -33,6 +33,11 @@ spec:
         - name: api
           image: faruryo/toban-api
           imagePullPolicy: Never
+          env:
+            - name: DEBUG_ECHO
+              value: "true"
+            - name: DEBUG_DB
+              value: "true"
           resources:
             requests:
               memory: "64Mi"
