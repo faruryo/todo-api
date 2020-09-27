@@ -64,13 +64,13 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Member        func(childComplexity int, id uint) int
-		Members       func(childComplexity int, limit *int, offset *int) int
+		Members       func(childComplexity int) int
 		Toban         func(childComplexity int, id uint) int
 		TobanMember   func(childComplexity int, id uint) int
-		TobanMembers  func(childComplexity int, limit *int, offset *int) int
+		TobanMembers  func(childComplexity int) int
 		TobanWariate  func(childComplexity int, id uint) int
-		TobanWariates func(childComplexity int, limit *int, offset *int) int
-		Tobans        func(childComplexity int, limit *int, offset *int) int
+		TobanWariates func(childComplexity int) int
+		Tobans        func(childComplexity int) int
 	}
 
 	Toban struct {
@@ -118,13 +118,13 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	TobanWariate(ctx context.Context, id uint) (*models.TobanWariate, error)
-	TobanWariates(ctx context.Context, limit *int, offset *int) ([]*models.TobanWariate, error)
+	TobanWariates(ctx context.Context) ([]*models.TobanWariate, error)
 	Toban(ctx context.Context, id uint) (*models.Toban, error)
-	Tobans(ctx context.Context, limit *int, offset *int) ([]*models.Toban, error)
+	Tobans(ctx context.Context) ([]*models.Toban, error)
 	TobanMember(ctx context.Context, id uint) (*models.TobanMember, error)
-	TobanMembers(ctx context.Context, limit *int, offset *int) ([]*models.TobanMember, error)
+	TobanMembers(ctx context.Context) ([]*models.TobanMember, error)
 	Member(ctx context.Context, id uint) (*models.Member, error)
-	Members(ctx context.Context, limit *int, offset *int) ([]*models.Member, error)
+	Members(ctx context.Context) ([]*models.Member, error)
 }
 type TobanMemberResolver interface {
 	TobanID(ctx context.Context, obj *models.TobanMember) (*models.Toban, error)
@@ -271,12 +271,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_members_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Members(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.Members(childComplexity), true
 
 	case "Query.toban":
 		if e.complexity.Query.Toban == nil {
@@ -307,12 +302,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_tobanMembers_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.TobanMembers(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.TobanMembers(childComplexity), true
 
 	case "Query.tobanWariate":
 		if e.complexity.Query.TobanWariate == nil {
@@ -331,24 +321,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_tobanWariates_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.TobanWariates(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.TobanWariates(childComplexity), true
 
 	case "Query.tobans":
 		if e.complexity.Query.Tobans == nil {
 			break
 		}
 
-		args, err := ec.field_Query_tobans_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Tobans(childComplexity, args["limit"].(*int), args["offset"].(*int)), true
+		return e.complexity.Query.Tobans(childComplexity), true
 
 	case "Toban.createdAt":
 		if e.complexity.Toban.CreatedAt == nil {
@@ -616,16 +596,16 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
 `, BuiltIn: false},
 	{Name: "schema/query.graphql", Input: `type Query {
     tobanWariate(id: ID!): TobanWariate
-    tobanWariates(limit: Int, offset: Int): [TobanWariate!]!
+    tobanWariates: [TobanWariate!]!
 
     toban(id: ID!): Toban
-    tobans(limit: Int, offset: Int): [Toban!]!
+    tobans: [Toban!]!
 
     tobanMember(id: ID!): TobanMember
-    tobanMembers(limit: Int, offset: Int): [TobanMember!]!
+    tobanMembers: [TobanMember!]!
 
     member(id: ID!): Member
-    members(limit: Int, offset: Int): [Member!]!
+    members: [Member!]!
 }
 `, BuiltIn: false},
 	{Name: "schema/scalars.graphql", Input: `# gqlgen supports some custom scalars out of the box
@@ -893,30 +873,6 @@ func (ec *executionContext) field_Query_member_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_members_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_tobanMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -929,30 +885,6 @@ func (ec *executionContext) field_Query_tobanMember_args(ctx context.Context, ra
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_tobanMembers_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
 	return args, nil
 }
 
@@ -971,30 +903,6 @@ func (ec *executionContext) field_Query_tobanWariate_args(ctx context.Context, r
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_tobanWariates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_toban_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1007,30 +915,6 @@ func (ec *executionContext) field_Query_toban_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_tobans_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["limit"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["offset"] = arg1
 	return args, nil
 }
 
@@ -1554,16 +1438,9 @@ func (ec *executionContext) _Query_tobanWariates(ctx context.Context, field grap
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_tobanWariates_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TobanWariates(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().TobanWariates(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1635,16 +1512,9 @@ func (ec *executionContext) _Query_tobans(ctx context.Context, field graphql.Col
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_tobans_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Tobans(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().Tobans(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1716,16 +1586,9 @@ func (ec *executionContext) _Query_tobanMembers(ctx context.Context, field graph
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_tobanMembers_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().TobanMembers(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().TobanMembers(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1797,16 +1660,9 @@ func (ec *executionContext) _Query_members(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_members_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Members(rctx, args["limit"].(*int), args["offset"].(*int))
+		return ec.resolvers.Query().Members(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5358,21 +5214,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
-}
-
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalInt(*v)
 }
 
 func (ec *executionContext) unmarshalOInterval2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐInterval(ctx context.Context, v interface{}) (*models.Interval, error) {

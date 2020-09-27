@@ -8,12 +8,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/faruryo/toban-api/databases"
 	"github.com/faruryo/toban-api/graph/generated"
 	"github.com/faruryo/toban-api/repositories"
 	"github.com/faruryo/toban-api/resolvers"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 const defaultPort = "8080"
@@ -25,13 +23,11 @@ func main() {
 		port = defaultPort
 	}
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		DisableAutomaticPing: true,
-	})
+	db, err := databases.GetDbByDsn(dsn, databases.Info)
 	if err != nil {
-		panic("failed to connect database")
+		log.Printf("failed to connect database: %v", err)
+		return
 	}
-	db.Debug()
 
 	srv := handler.NewDefaultServer(
 		generated.NewExecutableSchema(generated.Config{
@@ -47,5 +43,5 @@ func main() {
 	http.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Print(http.ListenAndServe(":"+port, nil))
 }

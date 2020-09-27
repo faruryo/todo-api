@@ -39,38 +39,7 @@ func (r *mutationResolver) DeleteToban(ctx context.Context, id uint) (bool, erro
 }
 
 func (r *mutationResolver) UpdateToban(ctx context.Context, input models.UpdateTobanInput) (*models.Toban, error) {
-	t, err := r.TobanRepository.Get(ctx, input.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	if input.Name != nil {
-		t.Name = *input.Name
-	}
-	if input.Description != nil {
-		t.Description = *input.Description
-	}
-	if input.Interval != nil {
-		t.Interval = *input.Interval
-	}
-	if input.DeadlineHour != nil {
-		t.DeadlineHour = *input.DeadlineHour
-	}
-	if input.DeadlineWeekDay != nil {
-		t.DeadlineWeekDay = *input.DeadlineWeekDay
-	}
-	if input.DeadlineWeek != nil {
-		t.DeadlineWeek = *input.DeadlineWeek
-	}
-	if input.Enabled != nil {
-		t.Enabled = *input.Enabled
-	}
-	if input.TobanMemberSequence != nil {
-		t.TobanMemberSequence = *input.TobanMemberSequence
-	}
-	t.CreatedAt = time.Time{}
-	t.UpdatedAt = time.Time{}
-	return r.TobanRepository.Update(ctx, t)
+	return r.TobanRepository.Update(ctx, &input)
 }
 
 func (r *mutationResolver) CreateTobanMember(ctx context.Context, input models.CreateTobanMemberInput) (*models.TobanMember, error) {

@@ -15,7 +15,7 @@ func (r *queryResolver) TobanWariate(ctx context.Context, id uint) (*models.Toba
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) TobanWariates(ctx context.Context, limit *int, offset *int) ([]*models.TobanWariate, error) {
+func (r *queryResolver) TobanWariates(ctx context.Context) ([]*models.TobanWariate, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -23,7 +23,7 @@ func (r *queryResolver) Toban(ctx context.Context, id uint) (*models.Toban, erro
 	return r.TobanRepository.Get(ctx, id)
 }
 
-func (r *queryResolver) Tobans(ctx context.Context, limit *int, offset *int) ([]*models.Toban, error) {
+func (r *queryResolver) Tobans(ctx context.Context) ([]*models.Toban, error) {
 	return r.TobanRepository.GetAll(ctx)
 }
 
@@ -31,7 +31,7 @@ func (r *queryResolver) TobanMember(ctx context.Context, id uint) (*models.Toban
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) TobanMembers(ctx context.Context, limit *int, offset *int) ([]*models.TobanMember, error) {
+func (r *queryResolver) TobanMembers(ctx context.Context) ([]*models.TobanMember, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -44,7 +44,7 @@ func (r *queryResolver) Member(ctx context.Context, id uint) (*models.Member, er
 	return member, nil
 }
 
-func (r *queryResolver) Members(ctx context.Context, limit *int, offset *int) ([]*models.Member, error) {
+func (r *queryResolver) Members(ctx context.Context) ([]*models.Member, error) {
 	members := []*models.Member{}
 	for _, member := range r.members {
 		members = append(members, member)

@@ -1,6 +1,7 @@
 {
     "go.inferGopath": false,
     "cSpell.words": [
+        "dialector",
         "go",
         "gorm",
         "toban"
