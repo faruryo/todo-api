@@ -38,6 +38,9 @@ spec:
               value: "true"
             - name: DEBUG_DB
               value: "true"
+          envFrom:
+            - configMapRef:
+                name: mysql-env
           resources:
             requests:
               memory: "64Mi"
@@ -45,3 +48,10 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "100m"
+          livenessProbe:
+            initialDelaySeconds: 30
+            httpGet:
+              port: 8080
+              path: /health
+            failureThreshold: 5
+            periodSeconds: 5

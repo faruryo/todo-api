@@ -1,9 +1,10 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
+
+	"github.com/labstack/gommon/log"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -16,7 +17,6 @@ import (
 )
 
 const defaultPort = "8080"
-const dsn = "toban:toban@tcp(toban-mysql:3306)/toban?charset=utf8mb4&parseTime=true"
 
 func main() {
 	port := os.Getenv("PORT")
@@ -34,10 +34,12 @@ func main() {
 
 	e := echo.New()
 
-	e.Use(middleware.Recover())
 	if debugEcho {
 		e.Use(middleware.Logger())
+		e.Logger.SetLevel(log.DEBUG)
 	}
+
+	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 
 	e.GET("/health", func(c echo.Context) error {
@@ -48,9 +50,9 @@ func main() {
 	if debugDb {
 		logLevel = databases.Info
 	}
-	db, err := databases.GetDbByDsn(dsn, logLevel)
+	db, err := databases.GetDbByEnv(logLevel)
 	if err != nil {
-		log.Printf("failed to connect database: %v", err)
+		e.Logger.Fatal("failed to connect database: %v", err)
 		return
 	}
 
