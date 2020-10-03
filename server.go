@@ -12,8 +12,8 @@ import (
 	"github.com/faruryo/toban-api/graph/generated"
 	"github.com/faruryo/toban-api/repositories"
 	"github.com/faruryo/toban-api/resolvers"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const defaultPort = "8080"
@@ -41,6 +41,7 @@ func main() {
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
+	e.Use(middleware.CORS())
 
 	e.GET("/health", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
