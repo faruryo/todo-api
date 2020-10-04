@@ -15,7 +15,7 @@ on:
 
 env:
   # TODO: Change variable to your image's name.
-  IMAGE_NAME: toban-api/toban-api
+  IMAGE_NAME: toban/toban-api
 
 jobs:
   # Run tests.
