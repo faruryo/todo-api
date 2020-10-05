@@ -57,7 +57,7 @@ func main() {
 		return
 	}
 
-	gqlEp := "graphql"
+	gqlEp := "api/graphql"
 	plgEp := "playground"
 	e.POST("/"+gqlEp, func(c echo.Context) error {
 		h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
