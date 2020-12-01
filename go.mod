@@ -11,5 +11,5 @@ require (
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.1.0
 	gorm.io/driver/mysql v1.0.3
-	gorm.io/gorm v1.20.5
+	gorm.io/gorm v1.20.7
 )
