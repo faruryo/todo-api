@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/labstack/gommon/log"
 
@@ -24,12 +25,12 @@ func main() {
 		port = defaultPort
 	}
 	debugEcho := false
-	if os.Getenv("DEBUG_ECHO") != "" {
-		debugEcho = true
+	if b, err := strconv.ParseBool(os.Getenv("DEBUG_ECHO")); err != nil {
+		debugEcho = b
 	}
 	debugDb := false
-	if os.Getenv("DEBUG_DB") != "" {
-		debugDb = true
+	if b, err := strconv.ParseBool(os.Getenv("DEBUG_DB")); err != nil {
+		debugDb = b
 	}
 
 	e := echo.New()
