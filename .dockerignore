@@ -1,3 +1,13 @@
 .git
+.github
+.vscode
+kubernetes
+.dockerignore
+.gitignore
+.tool-versions
 cover.html
 cover.out
+Dockerfile
+README.md
+renovate.json
+skaffold.yaml
