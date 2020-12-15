@@ -1,4 +1,4 @@
-package repositories
+package repository
 
 import (
 	"context"
@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/faruryo/toban-api/databases"
 	"github.com/faruryo/toban-api/models"
 	"github.com/google/go-cmp/cmp"
 	"gorm.io/driver/mysql"
@@ -39,11 +38,11 @@ func getDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	logLevel := databases.Silent
+	logLevel := Silent
 	if testing.Verbose() {
-		logLevel = databases.Info
+		logLevel = Info
 	}
-	gormDB, err := databases.GetDbByDialector(
+	gormDB, err := GetDbByDialector(
 		mysql.Dialector{Config: &mysql.Config{
 			DriverName:                "mysql",
 			Conn:                      db,

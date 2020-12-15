@@ -4,7 +4,7 @@ package resolvers
 
 import (
 	"github.com/faruryo/toban-api/models"
-	"github.com/faruryo/toban-api/repositories"
+	"github.com/faruryo/toban-api/repository"
 )
 
 // This file will not be regenerated automatically.
@@ -13,7 +13,6 @@ import (
 
 // Resolver データストアを持っているResolver構造体
 type Resolver struct {
-	tobans          []*models.Toban
 	members         map[uint]*models.Member
-	TobanRepository repositories.TobanRepository
+	TobanRepository repository.TobanRepository
 }

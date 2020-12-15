@@ -569,7 +569,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "schema/directives.graphql", Input: `# GQL Directives
+	{Name: "graph/schema/directives.graphql", Input: `# GQL Directives
 # This part is fairly necessary and is described in the gql documentation
 # https://gqlgen.com/config/
 directive @goModel(model: String, models: [String!]) on OBJECT
@@ -582,7 +582,7 @@ directive @goModel(model: String, models: [String!]) on OBJECT
 directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION
     | FIELD_DEFINITION
 `, BuiltIn: false},
-	{Name: "schema/mutation.graphql", Input: `type Mutation {
+	{Name: "graph/schema/mutation.graphql", Input: `type Mutation {
   createTobanWariate(input: CreateTobanWariateInput!): TobanWariate!
 
   createToban(input: CreateTobanInput!): Toban!
@@ -594,7 +594,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
   createMember(input: CreateMemberInput!): Member!
 }
 `, BuiltIn: false},
-	{Name: "schema/query.graphql", Input: `type Query {
+	{Name: "graph/schema/query.graphql", Input: `type Query {
     tobanWariate(id: ID!): TobanWariate
     tobanWariates: [TobanWariate!]!
 
@@ -608,7 +608,7 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
     members: [Member!]!
 }
 `, BuiltIn: false},
-	{Name: "schema/scalars.graphql", Input: `# gqlgen supports some custom scalars out of the box
+	{Name: "graph/schema/scalars.graphql", Input: `# gqlgen supports some custom scalars out of the box
 # see: https://github.com/99designs/gqlgen/blob/master/docs/content/reference/scalars.md
 
 # resolves to time.Time
@@ -629,12 +629,12 @@ scalar Any
 scalar Upload
 
 scalar Uint`, BuiltIn: false},
-	{Name: "schema/schema.graphql", Input: `schema {
+	{Name: "graph/schema/schema.graphql", Input: `schema {
     query: Query
     mutation: Mutation
 }
 `, BuiltIn: false},
-	{Name: "schema/types/member.graphql", Input: `type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
+	{Name: "graph/schema/types/member.graphql", Input: `type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
     id: ID!
 
     slackID: String!
@@ -650,7 +650,7 @@ input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.Cre
     name: String!
 }
 `, BuiltIn: false},
-	{Name: "schema/types/toban.graphql", Input: `type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
+	{Name: "graph/schema/types/toban.graphql", Input: `type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
     id: ID!
 
     name: String!
@@ -709,7 +709,7 @@ enum WeekDay @goModel(model: "github.com/faruryo/toban-api/models.WeekDay") {
     SATURDAY
     SUNDAY
 }`, BuiltIn: false},
-	{Name: "schema/types/toban_member.graphql", Input: `type TobanMember @goModel(model: "github.com/faruryo/toban-api/models.TobanMember") {
+	{Name: "graph/schema/types/toban_member.graphql", Input: `type TobanMember @goModel(model: "github.com/faruryo/toban-api/models.TobanMember") {
     id: ID!
 
     tobanID: Toban! @goField(forceResolver: true)
@@ -726,7 +726,7 @@ input CreateTobanMemberInput @goModel(model: "github.com/faruryo/toban-api/model
     memberID: ID!
 }
 `, BuiltIn: false},
-	{Name: "schema/types/toban_wariate.graphql", Input: `type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWariate") {
+	{Name: "graph/schema/types/toban_wariate.graphql", Input: `type TobanWariate @goModel(model: "github.com/faruryo/toban-api/models.TobanWariate") {
     id: ID!
 
 	tobanID: ID!
