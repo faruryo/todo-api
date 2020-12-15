@@ -6,7 +6,6 @@ package resolvers
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/faruryo/toban-api/graph/generated"
 	"github.com/faruryo/toban-api/models"
@@ -47,22 +46,12 @@ func (r *mutationResolver) CreateTobanMember(ctx context.Context, input models.C
 }
 
 func (r *mutationResolver) CreateMember(ctx context.Context, input models.CreateMemberInput) (*models.Member, error) {
-	id := uint(len(r.members))
 	m := &models.Member{
-		ID:      id,
 		SlackID: input.SlackID,
-
-		Name: input.Name,
-
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		Name:    input.Name,
 	}
 
-	if r.members == nil {
-		r.members = map[uint]*models.Member{}
-	}
-	r.members[id] = m
-	return m, nil
+	return r.Repository.CreateMember(ctx, m)
 }
 
 // Mutation returns generated.MutationResolver implementation.

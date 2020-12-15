@@ -35,9 +35,9 @@ spec:
           imagePullPolicy: Never
           env:
             - name: DEBUG_ECHO
-              value: "true"
+              value: "false"
             - name: DEBUG_DB
-              value: "true"
+              value: "false"
           envFrom:
             - configMapRef:
                 name: mysql-env

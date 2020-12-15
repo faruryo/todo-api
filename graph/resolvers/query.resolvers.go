@@ -36,20 +36,11 @@ func (r *queryResolver) TobanMembers(ctx context.Context) ([]*models.TobanMember
 }
 
 func (r *queryResolver) Member(ctx context.Context, id uint) (*models.Member, error) {
-	member, ok := r.members[id]
-	if !ok {
-		return nil, fmt.Errorf("member %d does not exist", id)
-	}
-
-	return member, nil
+	return r.Repository.GetMemberByID(ctx, id)
 }
 
 func (r *queryResolver) Members(ctx context.Context) ([]*models.Member, error) {
-	members := []*models.Member{}
-	for _, member := range r.members {
-		members = append(members, member)
-	}
-	return members, nil
+	return r.Repository.GetAllMembers(ctx)
 }
 
 // Query returns generated.QueryResolver implementation.

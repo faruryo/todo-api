@@ -637,7 +637,7 @@ scalar Uint`, BuiltIn: false},
 	{Name: "graph/schema/types/member.graphql", Input: `type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
     id: ID!
 
-    slackID: String!
+    slackID: String
 
     name: String!
 
@@ -646,8 +646,15 @@ scalar Uint`, BuiltIn: false},
 }
 
 input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.CreateMemberInput") {
-    slackID: String!
+    slackID: String
     name: String!
+}
+
+input UpdateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.UpdateMemberInput") {
+    id: ID!
+
+    slackID: String
+    name: String
 }
 `, BuiltIn: false},
 	{Name: "graph/schema/types/toban.graphql", Input: `type Toban @goModel(model: "github.com/faruryo/toban-api/models.Toban") {
@@ -1016,14 +1023,11 @@ func (ec *executionContext) _Member_slackID(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Member_name(ctx context.Context, field graphql.CollectedField, obj *models.Member) (ret graphql.Marshaler) {
@@ -3716,7 +3720,7 @@ func (ec *executionContext) unmarshalInputCreateMemberInput(ctx context.Context,
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slackID"))
-			it.SlackID, err = ec.unmarshalNString2string(ctx, v)
+			it.SlackID, err = ec.unmarshalOString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -3866,6 +3870,42 @@ func (ec *executionContext) unmarshalInputCreateTobanWariateInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateMemberInput(ctx context.Context, obj interface{}) (models.UpdateMemberInput, error) {
+	var it models.UpdateMemberInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2uint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "slackID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("slackID"))
+			it.SlackID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateTobanInput(ctx context.Context, obj interface{}) (models.UpdateTobanInput, error) {
 	var it models.UpdateTobanInput
 	var asMap = obj.(map[string]interface{})
@@ -3976,9 +4016,6 @@ func (ec *executionContext) _Member(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "slackID":
 			out.Values[i] = ec._Member_slackID(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "name":
 			out.Values[i] = ec._Member_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
