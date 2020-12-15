@@ -3,15 +3,15 @@ package main
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/labstack/gommon/log"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/faruryo/toban-api/databases"
 	"github.com/faruryo/toban-api/graph/generated"
-	"github.com/faruryo/toban-api/repositories"
-	"github.com/faruryo/toban-api/resolvers"
+	"github.com/faruryo/toban-api/graph/resolvers"
+	"github.com/faruryo/toban-api/repository"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -24,12 +24,12 @@ func main() {
 		port = defaultPort
 	}
 	debugEcho := false
-	if os.Getenv("DEBUG_ECHO") != "" {
-		debugEcho = true
+	if b, err := strconv.ParseBool(os.Getenv("DEBUG_ECHO")); err != nil {
+		debugEcho = b
 	}
 	debugDb := false
-	if os.Getenv("DEBUG_DB") != "" {
-		debugDb = true
+	if b, err := strconv.ParseBool(os.Getenv("DEBUG_DB")); err != nil {
+		debugDb = b
 	}
 
 	e := echo.New()
@@ -47,11 +47,11 @@ func main() {
 		return c.NoContent(http.StatusOK)
 	})
 
-	logLevel := databases.Silent
+	logLevel := repository.Silent
 	if debugDb {
-		logLevel = databases.Info
+		logLevel = repository.Info
 	}
-	db, err := databases.GetDbByEnv(logLevel)
+	db, err := repository.GetDbByEnv(logLevel)
 	if err != nil {
 		e.Logger.Fatal("failed to connect database: %v", err)
 		return
@@ -61,7 +61,7 @@ func main() {
 	plgEp := "playground"
 	e.POST("/"+gqlEp, func(c echo.Context) error {
 		h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-			Resolvers:  &resolvers.Resolver{TobanRepository: repositories.NewTobanRepository(db)},
+			Resolvers:  &resolvers.Resolver{Repository: repository.NewRepository(db)},
 			Directives: generated.DirectiveRoot{},
 			Complexity: generated.ComplexityRoot{},
 		}))
