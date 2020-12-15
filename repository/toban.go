@@ -8,38 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type TobanRepository interface {
-	Get(ctx context.Context, id uint) (*models.Toban, error)
-	GetAll(ctx context.Context) ([]*models.Toban, error)
-	Create(ctx context.Context, toban *models.Toban) (*models.Toban, error)
-	Update(ctx context.Context, toban *models.UpdateTobanInput) (*models.Toban, error)
-	Delete(ctx context.Context, id uint) (bool, error)
+func (r repository) GetTobanByID(ctx context.Context, id uint) (*models.Toban, error) {
+	return getTobanByID(r.db, id)
 }
 
-func NewTobanRepository(db *gorm.DB) TobanRepository {
-	db.AutoMigrate(&models.Toban{})
-
-	return NewTobanRepositoryNoMigrate(db)
-}
-
-func NewTobanRepositoryNoMigrate(db *gorm.DB) TobanRepository {
-	return &tobanRepository{
-		db: db,
-	}
-}
-
-// Interface実装チェック
-var _ TobanRepository = (*tobanRepository)(nil)
-
-type tobanRepository struct {
-	db *gorm.DB
-}
-
-func (r tobanRepository) Get(ctx context.Context, id uint) (*models.Toban, error) {
-	return get(r.db, id)
-}
-
-func get(db *gorm.DB, id uint) (*models.Toban, error) {
+func getTobanByID(db *gorm.DB, id uint) (*models.Toban, error) {
 	var toban models.Toban
 	err := db.First(&toban, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -52,7 +25,7 @@ func get(db *gorm.DB, id uint) (*models.Toban, error) {
 	return &toban, nil
 }
 
-func (r tobanRepository) GetAll(ctx context.Context) ([]*models.Toban, error) {
+func (r repository) GetAllTobans(ctx context.Context) ([]*models.Toban, error) {
 	var tobans []*models.Toban
 	if err := r.db.Find(&tobans).Error; err != nil {
 		return nil, err
@@ -61,9 +34,9 @@ func (r tobanRepository) GetAll(ctx context.Context) ([]*models.Toban, error) {
 	return tobans, nil
 }
 
-func (r tobanRepository) Create(ctx context.Context, toban *models.Toban) (*models.Toban, error) {
+func (r repository) CreateToban(ctx context.Context, toban *models.Toban) (*models.Toban, error) {
 	if toban.ID != 0 {
-		return nil, ErrBadRequestIdMustBeZero
+		return nil, ErrBadRequestIDMustBeZero
 	}
 	if !toban.CreatedAt.IsZero() {
 		return nil, ErrBadRequestUpdateCreatedAt
@@ -79,9 +52,9 @@ func (r tobanRepository) Create(ctx context.Context, toban *models.Toban) (*mode
 	return toban, nil
 }
 
-func (r tobanRepository) Update(ctx context.Context, input *models.UpdateTobanInput) (*models.Toban, error) {
+func (r repository) UpdateToban(ctx context.Context, input *models.UpdateTobanInput) (*models.Toban, error) {
 	if input.ID == 0 {
-		return nil, ErrBadRequestIdMustNotBeZero
+		return nil, ErrBadRequestIDMustNotBeZero
 	}
 
 	tx := r.db.Begin()
@@ -91,7 +64,7 @@ func (r tobanRepository) Update(ctx context.Context, input *models.UpdateTobanIn
 		}
 	}()
 
-	output, err := get(tx, input.ID)
+	output, err := getTobanByID(tx, input.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -131,9 +104,9 @@ func (r tobanRepository) Update(ctx context.Context, input *models.UpdateTobanIn
 	return output, nil
 }
 
-func (r tobanRepository) Delete(ctx context.Context, id uint) (bool, error) {
+func (r repository) DeleteTobanByID(ctx context.Context, id uint) (bool, error) {
 	if id == 0 {
-		return false, ErrBadRequestIdMustNotBeZero
+		return false, ErrBadRequestIDMustNotBeZero
 	}
 
 	var toban models.Toban

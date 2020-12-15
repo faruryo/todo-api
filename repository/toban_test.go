@@ -56,7 +56,7 @@ func getDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
 	return gormDB, mock, nil
 }
 
-func TestNewTobanRepository(t *testing.T) {
+func TestNewRepository(t *testing.T) {
 	// DBモック用意
 	db, mock, err := getDBMock()
 	if err != nil {
@@ -68,12 +68,12 @@ func TestNewTobanRepository(t *testing.T) {
 	mock.ExpectExec(sql).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Test開始
-	NewTobanRepository(db)
+	NewRepository(db)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-func getRepoAndMock(t *testing.T) (TobanRepository, sqlmock.Sqlmock) {
+func getRepoAndMock(t *testing.T) (Repository, sqlmock.Sqlmock) {
 	t.Helper()
 	// DBモック用意
 	db, mock, err := getDBMock()
@@ -82,7 +82,7 @@ func getRepoAndMock(t *testing.T) (TobanRepository, sqlmock.Sqlmock) {
 	}
 
 	// Test開始
-	repo := NewTobanRepositoryNoMigrate(db)
+	repo := NewRepositoryNoMigrate(db)
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
@@ -90,11 +90,11 @@ func getRepoAndMock(t *testing.T) (TobanRepository, sqlmock.Sqlmock) {
 	return repo, mock
 }
 
-func TestNewTobanRepositoryNoMigrate(t *testing.T) {
+func TestNewRepositoryNoMigrate(t *testing.T) {
 	getRepoAndMock(t)
 }
 
-func TestGet(t *testing.T) {
+func TestGetTobanByID(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	dbOutput := &models.Toban{
@@ -118,7 +118,7 @@ func TestGet(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(dbOutput.ID).WillReturnRows(rows)
 
 	// Test開始
-	output, err := repo.Get(ctx, dbOutput.ID)
+	output, err := repo.GetTobanByID(ctx, dbOutput.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -143,12 +143,12 @@ func TestGet_Error(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(input.ID).WillReturnRows(rows)
 
 	// Test開始
-	if _, err := repo.Get(ctx, input.ID); err != ErrNoSuchEntity {
+	if _, err := repo.GetTobanByID(ctx, input.ID); err != ErrNoSuchEntity {
 		t.Fatalf("it doesn't return an error when no such entity. %v", err)
 	}
 }
 
-func TestGetAll(t *testing.T) {
+func TestGetAllTobans(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	dbOutputs := []*models.Toban{
@@ -189,7 +189,7 @@ func TestGetAll(t *testing.T) {
 	mock.ExpectQuery(sql).WillReturnRows(rows)
 
 	// Test開始
-	output, err := repo.GetAll(ctx)
+	output, err := repo.GetAllTobans(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +201,7 @@ func TestGetAll(t *testing.T) {
 	}
 }
 
-func TestCreate(t *testing.T) {
+func TestCreateToban(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	input := &models.Toban{
@@ -221,7 +221,7 @@ func TestCreate(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input.Name, input.Description, input.Interval, input.DeadlineHour, input.DeadlineWeekDay, input.DeadlineWeek, input.Enabled, input.TobanMemberSequence, AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Test開始
-	_, err := repo.Create(ctx, input)
+	_, err := repo.CreateToban(ctx, input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,7 +239,7 @@ func TestCreate_Error(t *testing.T) {
 	}{
 		{
 			input: &models.Toban{ID: 1},
-			err:   ErrBadRequestIdMustBeZero,
+			err:   ErrBadRequestIDMustBeZero,
 		},
 		{
 			input: &models.Toban{CreatedAt: time.Now()},
@@ -252,13 +252,13 @@ func TestCreate_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if _, err := repo.Create(ctx, c.input); err != c.err {
+		if _, err := repo.CreateToban(ctx, c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
 }
 
-func TestUpdate(t *testing.T) {
+func TestUpdateToban(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	dbOutput := &models.Toban{
@@ -297,7 +297,7 @@ func TestUpdate(t *testing.T) {
 	mock.ExpectCommit()
 
 	// Test開始
-	_, err := repo.Update(ctx, input)
+	_, err := repo.UpdateToban(ctx, input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -321,18 +321,18 @@ func TestUpdate_Error(t *testing.T) {
 			input: &models.UpdateTobanInput{
 				Name: &inputInstance.Name,
 			},
-			err: ErrBadRequestIdMustNotBeZero,
+			err: ErrBadRequestIDMustNotBeZero,
 		},
 	}
 
 	for _, c := range cases {
-		if _, err := repo.Update(ctx, c.input); err != c.err {
+		if _, err := repo.UpdateToban(ctx, c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
 }
 
-func TestDelete(t *testing.T) {
+func TestDeleteTobanByID(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	var input uint = 1
@@ -342,7 +342,7 @@ func TestDelete(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Test開始
-	output, err := repo.Delete(ctx, input)
+	output, err := repo.DeleteTobanByID(ctx, input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -364,7 +364,7 @@ func TestDeleteNoSuchEntity(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(0, 0))
 
 	// Test開始
-	output, err := repo.Delete(ctx, input)
+	output, err := repo.DeleteTobanByID(ctx, input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -388,12 +388,12 @@ func TestDelete_Error(t *testing.T) {
 		{
 			input:  0,
 			output: false,
-			err:    ErrBadRequestIdMustNotBeZero,
+			err:    ErrBadRequestIDMustNotBeZero,
 		},
 	}
 
 	for _, c := range cases {
-		output, err := repo.Delete(ctx, c.input)
+		output, err := repo.DeleteTobanByID(ctx, c.input)
 		if err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}

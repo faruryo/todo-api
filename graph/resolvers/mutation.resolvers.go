@@ -31,15 +31,15 @@ func (r *mutationResolver) CreateToban(ctx context.Context, input models.CreateT
 		TobanMemberSequence: 0,
 	}
 
-	return r.TobanRepository.Create(ctx, t)
+	return r.Repository.CreateToban(ctx, t)
 }
 
 func (r *mutationResolver) DeleteToban(ctx context.Context, id uint) (bool, error) {
-	return r.TobanRepository.Delete(ctx, id)
+	return r.Repository.DeleteTobanByID(ctx, id)
 }
 
 func (r *mutationResolver) UpdateToban(ctx context.Context, input models.UpdateTobanInput) (*models.Toban, error) {
-	return r.TobanRepository.Update(ctx, &input)
+	return r.Repository.UpdateToban(ctx, &input)
 }
 
 func (r *mutationResolver) CreateTobanMember(ctx context.Context, input models.CreateTobanMemberInput) (*models.TobanMember, error) {

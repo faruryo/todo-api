@@ -13,6 +13,6 @@ import (
 
 // Resolver データストアを持っているResolver構造体
 type Resolver struct {
-	members         map[uint]*models.Member
-	TobanRepository repository.TobanRepository
+	members    map[uint]*models.Member
+	Repository repository.Repository
 }

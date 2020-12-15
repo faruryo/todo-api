@@ -20,11 +20,11 @@ func (r *queryResolver) TobanWariates(ctx context.Context) ([]*models.TobanWaria
 }
 
 func (r *queryResolver) Toban(ctx context.Context, id uint) (*models.Toban, error) {
-	return r.TobanRepository.Get(ctx, id)
+	return r.Repository.GetTobanByID(ctx, id)
 }
 
 func (r *queryResolver) Tobans(ctx context.Context) ([]*models.Toban, error) {
-	return r.TobanRepository.GetAll(ctx)
+	return r.Repository.GetAllTobans(ctx)
 }
 
 func (r *queryResolver) TobanMember(ctx context.Context, id uint) (*models.TobanMember, error) {

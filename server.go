@@ -61,7 +61,7 @@ func main() {
 	plgEp := "playground"
 	e.POST("/"+gqlEp, func(c echo.Context) error {
 		h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-			Resolvers:  &resolvers.Resolver{TobanRepository: repository.NewTobanRepository(db)},
+			Resolvers:  &resolvers.Resolver{Repository: repository.NewRepository(db)},
 			Directives: generated.DirectiveRoot{},
 			Complexity: generated.ComplexityRoot{},
 		}))
