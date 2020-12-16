@@ -60,8 +60,13 @@ func main() {
 	gqlEp := "api/graphql"
 	plgEp := "playground"
 	e.POST("/"+gqlEp, func(c echo.Context) error {
+		repo, err := repository.NewRepository(db)
+		if err != nil {
+			e.Logger.Fatalf("Failed to create repository : %s", err)
+		}
+
 		h := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
-			Resolvers:  &resolvers.Resolver{Repository: repository.NewRepository(db)},
+			Resolvers:  &resolvers.Resolver{Repository: repo},
 			Directives: generated.DirectiveRoot{},
 			Complexity: generated.ComplexityRoot{},
 		}))

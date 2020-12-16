@@ -21,11 +21,12 @@ type Repository interface {
 	DeleteMemberByID(ctx context.Context, id uint) (bool, error)
 }
 
-func NewRepository(db *gorm.DB) Repository {
-	db.AutoMigrate(&models.Toban{})
-	db.AutoMigrate(&models.Member{})
+func NewRepository(db *gorm.DB) (Repository, error) {
+	if err := db.AutoMigrate(&models.Toban{}, &models.Member{}); err != nil {
+		return nil, err
+	}
 
-	return NewRepositoryNoMigrate(db)
+	return NewRepositoryNoMigrate(db), nil
 }
 
 func NewRepositoryNoMigrate(db *gorm.DB) Repository {
