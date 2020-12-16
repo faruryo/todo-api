@@ -21,7 +21,11 @@ func TestNewRepository(t *testing.T) {
 	mock.ExpectExec(sql).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Start Test
-	NewRepository(db)
+	_, err = NewRepository(db)
+	if err != nil {
+		t.Errorf("failed to create repository.: %s", err)
+	}
+
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}

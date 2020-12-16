@@ -16,8 +16,8 @@ func (r *tobanMemberResolver) TobanID(ctx context.Context, obj *models.TobanMemb
 }
 
 func (r *tobanMemberResolver) MemberID(ctx context.Context, obj *models.TobanMember) (*models.Member, error) {
-	member, ok := r.members[obj.MemberID]
-	if !ok {
+	member, err := r.Repository.GetMemberByID(ctx, obj.MemberID)
+	if err != nil {
 		return nil, fmt.Errorf("member %d does not exist", obj.MemberID)
 	}
 
