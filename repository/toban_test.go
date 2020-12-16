@@ -1,9 +1,6 @@
 package repository
 
 import (
-	"context"
-	"database/sql/driver"
-	"os"
 	"regexp"
 	"testing"
 	"time"
@@ -11,88 +8,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/faruryo/toban-api/models"
 	"github.com/google/go-cmp/cmp"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
-
-type AnyTime struct{}
-
-func (a AnyTime) Match(v driver.Value) bool {
-	_, ok := v.(time.Time)
-	return ok
-}
-
-var ctx context.Context
-
-func TestMain(m *testing.M) {
-
-	ctx = context.Background()
-
-	code := m.Run()
-
-	os.Exit(code)
-}
-
-func getDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		return nil, nil, err
-	}
-	logLevel := Silent
-	if testing.Verbose() {
-		logLevel = Info
-	}
-	gormDB, err := GetDbByDialector(
-		mysql.Dialector{Config: &mysql.Config{
-			DriverName:                "mysql",
-			Conn:                      db,
-			SkipInitializeWithVersion: true,
-		}},
-		logLevel,
-	)
-	if err != nil {
-		return nil, nil, err
-	}
-	return gormDB, mock, nil
-}
-
-func TestNewRepository(t *testing.T) {
-	// DBモック用意
-	db, mock, err := getDBMock()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-
-	// sqlmock準備
-	sql := regexp.QuoteMeta("CREATE TABLE `tobans`")
-	mock.ExpectExec(sql).WillReturnResult(sqlmock.NewResult(1, 1))
-
-	// Test開始
-	NewRepository(db)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
-}
-func getRepoAndMock(t *testing.T) (Repository, sqlmock.Sqlmock) {
-	t.Helper()
-	// DBモック用意
-	db, mock, err := getDBMock()
-	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-	}
-
-	// Test開始
-	repo := NewRepositoryNoMigrate(db)
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %s", err)
-	}
-
-	return repo, mock
-}
-
-func TestNewRepositoryNoMigrate(t *testing.T) {
-	getRepoAndMock(t)
-}
 
 func TestGetTobanByID(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
@@ -130,7 +46,7 @@ func TestGetTobanByID(t *testing.T) {
 	}
 }
 
-func TestGet_Error(t *testing.T) {
+func TestGetTobanByID_Error(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	input := &models.Toban{
@@ -230,7 +146,7 @@ func TestCreateToban(t *testing.T) {
 	}
 }
 
-func TestCreate_Error(t *testing.T) {
+func TestCreateToban_Error(t *testing.T) {
 	repo, _ := getRepoAndMock(t)
 
 	cases := []struct {
@@ -306,7 +222,7 @@ func TestUpdateToban(t *testing.T) {
 	}
 }
 
-func TestUpdate_Error(t *testing.T) {
+func TestUpdateToban_Error(t *testing.T) {
 	repo, _ := getRepoAndMock(t)
 
 	inputInstance := &models.Toban{
@@ -354,7 +270,7 @@ func TestDeleteTobanByID(t *testing.T) {
 		t.Errorf("there were unfulfilled expectations: %s", err)
 	}
 }
-func TestDeleteNoSuchEntity(t *testing.T) {
+func TestDeleteTobanByIDNoSuchEntity(t *testing.T) {
 	repo, mock := getRepoAndMock(t)
 
 	var input uint = 1
@@ -377,7 +293,7 @@ func TestDeleteNoSuchEntity(t *testing.T) {
 	}
 }
 
-func TestDelete_Error(t *testing.T) {
+func TestDeleteTobanByID_Error(t *testing.T) {
 	repo, _ := getRepoAndMock(t)
 
 	cases := []struct {

@@ -1,7 +1,7 @@
 type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
     id: ID!
 
-    slackID: String!
+    slackID: String
 
     name: String!
 
@@ -10,6 +10,13 @@ type Member @goModel(model: "github.com/faruryo/toban-api/models.Member") {
 }
 
 input CreateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.CreateMemberInput") {
-    slackID: String!
+    slackID: String
     name: String!
+}
+
+input UpdateMemberInput @goModel(model: "github.com/faruryo/toban-api/models.UpdateMemberInput") {
+    id: ID!
+
+    slackID: String
+    name: String
 }

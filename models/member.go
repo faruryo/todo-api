@@ -17,3 +17,10 @@ type CreateMemberInput struct {
 	SlackID string `json:"slackID"`
 	Name    string `json:"name"`
 }
+
+type UpdateMemberInput struct {
+	ID uint `json:"id"`
+
+	SlackID *string `json:"slackID"`
+	Name    *string `json:"name"`
+}

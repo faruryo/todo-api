@@ -13,10 +13,17 @@ type Repository interface {
 	CreateToban(ctx context.Context, toban *models.Toban) (*models.Toban, error)
 	UpdateToban(ctx context.Context, toban *models.UpdateTobanInput) (*models.Toban, error)
 	DeleteTobanByID(ctx context.Context, id uint) (bool, error)
+
+	GetMemberByID(ctx context.Context, id uint) (*models.Member, error)
+	GetAllMembers(ctx context.Context) ([]*models.Member, error)
+	CreateMember(ctx context.Context, member *models.Member) (*models.Member, error)
+	UpdateMember(ctx context.Context, member *models.UpdateMemberInput) (*models.Member, error)
+	DeleteMemberByID(ctx context.Context, id uint) (bool, error)
 }
 
 func NewRepository(db *gorm.DB) Repository {
 	db.AutoMigrate(&models.Toban{})
+	db.AutoMigrate(&models.Member{})
 
 	return NewRepositoryNoMigrate(db)
 }
