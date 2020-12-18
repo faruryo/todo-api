@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"regexp"
 	"testing"
 	"time"
@@ -34,7 +35,7 @@ func TestGetTobanByID(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(dbOutput.ID).WillReturnRows(rows)
 
 	// Test開始
-	output, err := repo.GetTobanByID(ctx, dbOutput.ID)
+	output, err := repo.GetTobanByID(context.Background(), dbOutput.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +60,7 @@ func TestGetTobanByID_Error(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(input.ID).WillReturnRows(rows)
 
 	// Test開始
-	if _, err := repo.GetTobanByID(ctx, input.ID); err != ErrNoSuchEntity {
+	if _, err := repo.GetTobanByID(context.Background(), input.ID); err != ErrNoSuchEntity {
 		t.Fatalf("it doesn't return an error when no such entity. %v", err)
 	}
 }
@@ -105,7 +106,7 @@ func TestGetAllTobans(t *testing.T) {
 	mock.ExpectQuery(sql).WillReturnRows(rows)
 
 	// Test開始
-	output, err := repo.GetAllTobans(ctx)
+	output, err := repo.GetAllTobans(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +138,7 @@ func TestCreateToban(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input.Name, input.Description, input.Interval, input.DeadlineHour, input.DeadlineWeekDay, input.DeadlineWeek, input.Enabled, input.TobanMemberSequence, AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Test開始
-	_, err := repo.CreateToban(ctx, input)
+	_, err := repo.CreateToban(context.Background(), input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,7 +169,7 @@ func TestCreateToban_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if _, err := repo.CreateToban(ctx, c.input); err != c.err {
+		if _, err := repo.CreateToban(context.Background(), c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
@@ -213,7 +214,7 @@ func TestUpdateToban(t *testing.T) {
 	mock.ExpectCommit()
 
 	// Test開始
-	_, err := repo.UpdateToban(ctx, input)
+	_, err := repo.UpdateToban(context.Background(), input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -242,7 +243,7 @@ func TestUpdateToban_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if _, err := repo.UpdateToban(ctx, c.input); err != c.err {
+		if _, err := repo.UpdateToban(context.Background(), c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
@@ -258,7 +259,7 @@ func TestDeleteTobanByID(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Test開始
-	output, err := repo.DeleteTobanByID(ctx, input)
+	output, err := repo.DeleteTobanByID(context.Background(), input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -280,7 +281,7 @@ func TestDeleteTobanByIDNoSuchEntity(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(0, 0))
 
 	// Test開始
-	output, err := repo.DeleteTobanByID(ctx, input)
+	output, err := repo.DeleteTobanByID(context.Background(), input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -309,7 +310,7 @@ func TestDeleteTobanByID_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		output, err := repo.DeleteTobanByID(ctx, c.input)
+		output, err := repo.DeleteTobanByID(context.Background(), c.input)
 		if err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}

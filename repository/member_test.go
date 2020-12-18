@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"regexp"
 	"testing"
 	"time"
@@ -26,7 +27,7 @@ func TestGetMemberByID(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(dbOutput.ID).WillReturnRows(rows)
 
 	// Start Test
-	output, err := repo.GetMemberByID(ctx, dbOutput.ID)
+	output, err := repo.GetMemberByID(context.Background(), dbOutput.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +52,7 @@ func TestGetMemberByID_Error(t *testing.T) {
 	mock.ExpectQuery(sql).WithArgs(input.ID).WillReturnRows(rows)
 
 	// Start Test
-	if _, err := repo.GetMemberByID(ctx, input.ID); err != ErrNoSuchEntity {
+	if _, err := repo.GetMemberByID(context.Background(), input.ID); err != ErrNoSuchEntity {
 		t.Fatalf("it doesn't return an error when no such entity. %v", err)
 	}
 }
@@ -85,7 +86,7 @@ func TestGetAllMembers(t *testing.T) {
 	mock.ExpectQuery(sql).WillReturnRows(rows)
 
 	// Start Test
-	output, err := repo.GetAllMembers(ctx)
+	output, err := repo.GetAllMembers(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -111,7 +112,7 @@ func TestCreateMember(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input.SlackID, input.Name, AnyTime{}, AnyTime{}).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Start Test
-	_, err := repo.CreateMember(ctx, input)
+	_, err := repo.CreateMember(context.Background(), input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -142,7 +143,7 @@ func TestCreateMember_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if _, err := repo.CreateMember(ctx, c.input); err != c.err {
+		if _, err := repo.CreateMember(context.Background(), c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
@@ -175,7 +176,7 @@ func TestUpdateMember(t *testing.T) {
 	mock.ExpectCommit()
 
 	// Start Test
-	_, err := repo.UpdateMember(ctx, input)
+	_, err := repo.UpdateMember(context.Background(), input)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +205,7 @@ func TestUpdateMember_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		if _, err := repo.UpdateMember(ctx, c.input); err != c.err {
+		if _, err := repo.UpdateMember(context.Background(), c.input); err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}
 	}
@@ -220,7 +221,7 @@ func TestDeleteMemberByID(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Start Test
-	output, err := repo.DeleteMemberByID(ctx, input)
+	output, err := repo.DeleteMemberByID(context.Background(), input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -242,7 +243,7 @@ func TestDeleteMemberByIDNoSuchEntity(t *testing.T) {
 	mock.ExpectExec(sql).WithArgs(input).WillReturnResult(sqlmock.NewResult(0, 0))
 
 	// Start Test
-	output, err := repo.DeleteMemberByID(ctx, input)
+	output, err := repo.DeleteMemberByID(context.Background(), input)
 	if err != nil {
 		t.Fatalf("Unexpected error :%v", err)
 	}
@@ -271,7 +272,7 @@ func TestDeleteMemberByID_Error(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		output, err := repo.DeleteMemberByID(ctx, c.input)
+		output, err := repo.DeleteMemberByID(context.Background(), c.input)
 		if err != c.err {
 			t.Errorf("Reverse(%v) => err(%v), want err(%v)", c.input, err, c.err)
 		}

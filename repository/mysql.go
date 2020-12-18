@@ -3,29 +3,31 @@ package repository
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-func GetDbByDsn(dsn string, logLevel LogLevel) (*gorm.DB, error) {
-	return GetDbByDialector(mysql.Open(dsn), logLevel)
+// DBConnectionOptions is a structure that summarizes the options required when connecting to a DB.
+type DBConnectionOptions struct {
+	User     string
+	Password string
+	Database string
+	Host     string
 }
 
-func GetDbByEnv(logLevel LogLevel) (*gorm.DB, error) {
-	var (
-		user     = os.Getenv("MYSQL_USER")
-		password = os.Getenv("MYSQL_PASSWORD")
-		database = os.Getenv("MYSQL_DATABASE")
-		host     = os.Getenv("MYSQL_HOST")
-	)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=true", user, password, host, database)
-	return GetDbByDialector(mysql.Open(dsn), logLevel)
+// GetDb creates a gorm.DB instance.
+func GetDb(opt DBConnectionOptions, logLevel LogLevel) (*gorm.DB, error) {
+	dsn := assembleDSN(opt)
+	return getDbByDialector(mysql.Open(dsn), logLevel)
 }
 
-func GetDbByDialector(dialector gorm.Dialector, logLevel LogLevel) (*gorm.DB, error) {
+func assembleDSN(opt DBConnectionOptions) string {
+	return fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=true", opt.User, opt.Password, opt.Host, opt.Database)
+}
+
+func getDbByDialector(dialector gorm.Dialector, logLevel LogLevel) (*gorm.DB, error) {
 	db, err := gorm.Open(
 		dialector,
 		&gorm.Config{

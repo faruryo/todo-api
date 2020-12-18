@@ -51,7 +51,7 @@ func main() {
 	if debugDb {
 		logLevel = repository.Info
 	}
-	db, err := repository.GetDbByEnv(logLevel)
+	db, err := repository.GetDb(makeDBConnectionOptionsByEnv(), logLevel)
 	if err != nil {
 		e.Logger.Fatal("failed to connect database: %v", err)
 		return
@@ -85,4 +85,14 @@ func main() {
 	e.HideBanner = true
 	e.Logger.Infof("connect to http://localhost:%s/%s for GraphQL playground", port, plgEp)
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+func makeDBConnectionOptionsByEnv() repository.DBConnectionOptions {
+	opt := repository.DBConnectionOptions{
+		User:     os.Getenv("MYSQL_USER"),
+		Password: os.Getenv("MYSQL_PASSWORD"),
+		Database: os.Getenv("MYSQL_DATABASE"),
+		Host:     os.Getenv("MYSQL_HOST"),
+	}
+	return opt
 }
