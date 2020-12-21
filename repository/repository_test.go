@@ -9,6 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type AnyTime struct{}
@@ -23,17 +24,21 @@ func getDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	logLevel := Silent
+	logLevel := logger.Silent
 	if testing.Verbose() {
-		logLevel = Info
+		logLevel = logger.Info
 	}
-	gormDB, err := getDbByDialector(
+	gormDB, err := gorm.Open(
 		mysql.Dialector{Config: &mysql.Config{
 			DriverName:                "mysql",
 			Conn:                      db,
 			SkipInitializeWithVersion: true,
 		}},
-		logLevel,
+		&gorm.Config{
+			DisableAutomaticPing:   true,
+			SkipDefaultTransaction: true,
+			Logger:                 logger.Default.LogMode(logLevel),
+		},
 	)
 	if err != nil {
 		return nil, nil, err
