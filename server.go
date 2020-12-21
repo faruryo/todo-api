@@ -1,11 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
-	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/gommon/log"
+	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -19,17 +25,16 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	port := os.Getenv("PORT")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	port := viper.GetString("port")
 	if port == "" {
 		port = defaultPort
 	}
 	debugEcho := false
-	if b, err := strconv.ParseBool(os.Getenv("DEBUG_ECHO")); err != nil {
+	if b, err := strconv.ParseBool(viper.GetString("debug.echo")); err != nil {
 		debugEcho = b
-	}
-	debugDb := false
-	if b, err := strconv.ParseBool(os.Getenv("DEBUG_DB")); err != nil {
-		debugDb = b
 	}
 
 	e := echo.New()
@@ -47,11 +52,7 @@ func main() {
 		return c.NoContent(http.StatusOK)
 	})
 
-	logLevel := repository.Silent
-	if debugDb {
-		logLevel = repository.Info
-	}
-	db, err := repository.GetDbByEnv(logLevel)
+	db, err := connectDB()
 	if err != nil {
 		e.Logger.Fatal("failed to connect database: %v", err)
 		return
@@ -85,4 +86,53 @@ func main() {
 	e.HideBanner = true
 	e.Logger.Infof("connect to http://localhost:%s/%s for GraphQL playground", port, plgEp)
 	e.Logger.Fatal(e.Start(":" + port))
+}
+
+func connectDB() (*gorm.DB, error) {
+	debugDb := false
+	if b, err := strconv.ParseBool(viper.GetString("debug.db")); err != nil {
+		debugDb = b
+	}
+	logLevel := logger.Silent
+	if debugDb {
+		logLevel = logger.Info
+	}
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=true",
+		viper.GetString("mysql.user"),
+		viper.GetString("mysql.password"),
+		viper.GetString("mysql.host"),
+		viper.GetString("mysql.database"),
+	)
+
+	var retryDuration time.Duration
+	maxRetryNumber := 4
+	var db *gorm.DB
+	var err error
+	for i := 0; i < maxRetryNumber; i++ {
+		db, err = gorm.Open(
+			mysql.Open(dsn),
+			&gorm.Config{
+				DisableAutomaticPing:   true,
+				SkipDefaultTransaction: true,
+				Logger:                 logger.Default.LogMode(logLevel),
+			},
+		)
+		if err == nil {
+			break
+		}
+		log.Print(err)
+		retryDuration = time.Duration(i*2) * time.Second
+		log.Printf("issue connecting to database, retrying. retryNumber:%d, retryDuration:%s", i, retryDuration)
+		if i != maxRetryNumber-1 {
+			time.Sleep(retryDuration)
+		}
+	}
+	if err != nil {
+		log.Printf("failed to connect database: %v", err)
+		log.Printf("dialector: %s", dsn)
+		return nil, err
+	}
+
+	return db, nil
 }

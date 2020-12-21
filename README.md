@@ -1,4 +1,8 @@
+# toban-api
 
+[![Coverage Status](https://coveralls.io/repos/github/faruryo/toban-api/badge.svg?branch=master)](https://coveralls.io/github/faruryo/toban-api?branch=master)
+![Test](https://github.com/faruryo/toban-api/workflows/Test/badge.svg)
+![Test](https://github.com/faruryo/toban-api/workflows/Docker/badge.svg)
 ## Develop
 
 ### code generate

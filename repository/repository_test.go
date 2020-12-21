@@ -1,11 +1,67 @@
 package repository
 
 import (
+	"database/sql/driver"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
+
+type AnyTime struct{}
+
+func (a AnyTime) Match(v driver.Value) bool {
+	_, ok := v.(time.Time)
+	return ok
+}
+
+func getDBMock() (*gorm.DB, sqlmock.Sqlmock, error) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		return nil, nil, err
+	}
+	logLevel := logger.Silent
+	if testing.Verbose() {
+		logLevel = logger.Info
+	}
+	gormDB, err := gorm.Open(
+		mysql.Dialector{Config: &mysql.Config{
+			DriverName:                "mysql",
+			Conn:                      db,
+			SkipInitializeWithVersion: true,
+		}},
+		&gorm.Config{
+			DisableAutomaticPing:   true,
+			SkipDefaultTransaction: true,
+			Logger:                 logger.Default.LogMode(logLevel),
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	return gormDB, mock, nil
+}
+
+func getRepoAndMock(t *testing.T) (Repository, sqlmock.Sqlmock) {
+	t.Helper()
+	// DBモック用意
+	db, mock, err := getDBMock()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	// Test開始
+	repo := NewRepositoryNoMigrate(db)
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("there were unfulfilled expectations: %s", err)
+	}
+
+	return repo, mock
+}
 
 func TestNewRepository(t *testing.T) {
 	// Prepare DB mock
