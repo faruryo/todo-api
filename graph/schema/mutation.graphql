@@ -8,4 +8,6 @@ type Mutation {
   createTobanMember(input: CreateTobanMemberInput!): TobanMember!
 
   createMember(input: CreateMemberInput!): Member!
+  deleteMember(id: ID!): Boolean!
+  updateMember(input: UpdateMemberInput!): Member!
 }
