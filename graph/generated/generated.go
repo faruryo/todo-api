@@ -58,7 +58,9 @@ type ComplexityRoot struct {
 		CreateToban        func(childComplexity int, input models.CreateTobanInput) int
 		CreateTobanMember  func(childComplexity int, input models.CreateTobanMemberInput) int
 		CreateTobanWariate func(childComplexity int, input models.CreateTobanWariateInput) int
+		DeleteMember       func(childComplexity int, id uint) int
 		DeleteToban        func(childComplexity int, id uint) int
+		UpdateMember       func(childComplexity int, input models.UpdateMemberInput) int
 		UpdateToban        func(childComplexity int, input models.UpdateTobanInput) int
 	}
 
@@ -115,6 +117,8 @@ type MutationResolver interface {
 	UpdateToban(ctx context.Context, input models.UpdateTobanInput) (*models.Toban, error)
 	CreateTobanMember(ctx context.Context, input models.CreateTobanMemberInput) (*models.TobanMember, error)
 	CreateMember(ctx context.Context, input models.CreateMemberInput) (*models.Member, error)
+	DeleteMember(ctx context.Context, id uint) (bool, error)
+	UpdateMember(ctx context.Context, input models.UpdateMemberInput) (*models.Member, error)
 }
 type QueryResolver interface {
 	TobanWariate(ctx context.Context, id uint) (*models.TobanWariate, error)
@@ -230,6 +234,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateTobanWariate(childComplexity, args["input"].(models.CreateTobanWariateInput)), true
 
+	case "Mutation.deleteMember":
+		if e.complexity.Mutation.DeleteMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteMember_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteMember(childComplexity, args["id"].(uint)), true
+
 	case "Mutation.deleteToban":
 		if e.complexity.Mutation.DeleteToban == nil {
 			break
@@ -241,6 +257,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteToban(childComplexity, args["id"].(uint)), true
+
+	case "Mutation.updateMember":
+		if e.complexity.Mutation.UpdateMember == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateMember_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateMember(childComplexity, args["input"].(models.UpdateMemberInput)), true
 
 	case "Mutation.updateToban":
 		if e.complexity.Mutation.UpdateToban == nil {
@@ -592,6 +620,8 @@ directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITI
   createTobanMember(input: CreateTobanMemberInput!): TobanMember!
 
   createMember(input: CreateMemberInput!): Member!
+  deleteMember(id: ID!): Boolean!
+  updateMember(input: UpdateMemberInput!): Member!
 }
 `, BuiltIn: false},
 	{Name: "graph/schema/query.graphql", Input: `type Query {
@@ -820,6 +850,21 @@ func (ec *executionContext) field_Mutation_createToban_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 uint
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNID2uint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deleteToban_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -832,6 +877,21 @@ func (ec *executionContext) field_Mutation_deleteToban_args(ctx context.Context,
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateMember_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 models.UpdateMemberInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNUpdateMemberInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐUpdateMemberInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1371,6 +1431,90 @@ func (ec *executionContext) _Mutation_createMember(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateMember(rctx, args["input"].(models.CreateMemberInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Member)
+	fc.Result = res
+	return ec.marshalNMember2ᚖgithubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐMember(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteMember_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteMember(rctx, args["id"].(uint))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateMember(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateMember_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateMember(rctx, args["input"].(models.UpdateMemberInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4087,6 +4231,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteMember":
+			out.Values[i] = ec._Mutation_deleteMember(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateMember":
+			out.Values[i] = ec._Mutation_updateMember(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4983,6 +5137,11 @@ func (ec *executionContext) marshalNUint2uint(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpdateMemberInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐUpdateMemberInput(ctx context.Context, v interface{}) (models.UpdateMemberInput, error) {
+	res, err := ec.unmarshalInputUpdateMemberInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNUpdateTobanInput2githubᚗcomᚋfaruryoᚋtobanᚑapiᚋmodelsᚐUpdateTobanInput(ctx context.Context, v interface{}) (models.UpdateTobanInput, error) {

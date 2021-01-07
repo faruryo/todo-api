@@ -8,9 +8,6 @@ on:
       - v*
   pull_request:
 
-env:
-  IMAGE_NAME: toban/toban-api
-
 jobs:
   test:
     runs-on: ubuntu-latest

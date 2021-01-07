@@ -54,6 +54,14 @@ func (r *mutationResolver) CreateMember(ctx context.Context, input models.Create
 	return r.Repository.CreateMember(ctx, m)
 }
 
+func (r *mutationResolver) DeleteMember(ctx context.Context, id uint) (bool, error) {
+	return r.Repository.DeleteMemberByID(ctx, id)
+}
+
+func (r *mutationResolver) UpdateMember(ctx context.Context, input models.UpdateMemberInput) (*models.Member, error) {
+	return r.Repository.UpdateMember(ctx, &input)
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
