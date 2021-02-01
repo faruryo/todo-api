@@ -1,4 +1,4 @@
-FROM golang:1.15.6-alpine3.12 as builder
+FROM golang:1.15.7-alpine3.12 as builder
 
 WORKDIR /workdir
 
@@ -9,6 +9,6 @@ RUN go mod download
 COPY . .
 RUN go build -o /go-app server.go
 
-FROM alpine:3.12
+FROM alpine:3.13
 COPY --from=builder /go-app .
 ENTRYPOINT ["./go-app"]
