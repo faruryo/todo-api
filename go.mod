@@ -11,6 +11,6 @@ require (
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.5.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.2.0
-	gorm.io/driver/mysql v1.1.0
+	gorm.io/driver/mysql v1.1.1
 	gorm.io/gorm v1.21.10
 )
