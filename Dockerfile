@@ -9,6 +9,6 @@ RUN go mod download
 COPY . .
 RUN go build -o /go-app server.go
 
-FROM alpine:3.13
+FROM alpine:3.14
 COPY --from=builder /go-app .
 ENTRYPOINT ["./go-app"]
