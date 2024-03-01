@@ -30,7 +30,7 @@ jobs:
           fi
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v4
 
       - name: Build
         run: go build -v ./...
